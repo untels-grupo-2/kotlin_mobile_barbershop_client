@@ -1,0 +1,181 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#212121">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- NestedScrollView for scrolling content -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:background="#212121"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/fondo_parte_1">
+
+                <!-- Logo and title -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imagenEncimaTitulo"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/logobarbershop"
+                    android:background="@android:color/white"
+                    app:shapeAppearanceOverlay="@style/CircularShape"
+                    app:layout_constraintBottom_toTopOf="@+id/tituloTienda"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tituloTienda"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="BARBERSHOP DIAMOND"
+                    android:textColor="#FFFFFF"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/imagenEncimaTitulo" />
+
+                <!-- Subtitle below title -->
+                <TextView
+                    android:id="@+id/subTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:gravity="center"
+                    android:text="Tu mejor versión empieza aquí"
+                    android:textColor="#FFA500"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/tituloServicios"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tituloTienda" />
+
+                <!-- Servicios title -->
+                <TextView
+                    android:id="@+id/tituloServicios"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/border_titulo_servicios"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="Nuestros Servicios"
+                    android:textColor="#FFD700"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/subTitulo" />
+
+                <!-- Horizontal Scroll for category buttons -->
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/tituloServicios">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/serviciosButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="16dp"
+                            android:backgroundTint="#FF9800"
+                            android:text="Todos"
+                            android:textColor="#000000" />
+
+                        <Button
+                            android:id="@+id/cortesButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="16dp"
+                            android:backgroundTint="#FF9800"
+                            android:text="Cortes"
+                            android:textColor="#000000" />
+
+                        <Button
+                            android:id="@+id/SkincareButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="16dp"
+                            android:backgroundTint="#FF9800"
+                            android:text="Skincare"
+                            android:textColor="#000000" />
+
+                        <Button
+                            android:id="@+id/AfeitadoButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="#FF9800"
+                            android:layout_marginEnd="16dp"
+                            android:text="Afeitado de Barba"
+                            android:textColor="#000000" />
+
+                        <Button
+                            android:id="@+id/ColoracionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="#FF9800"
+                            android:text="Coloración"
+                            android:textColor="#000000" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Servicios RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewServicios"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/horizontalScrollView" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Bottom Navigation -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#333333"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:itemIconTint="@drawable/color_state_list"
+            app:itemTextColor="@color/white"
+            app:menu="@menu/bottom_nav_menu"
+            app:itemBackground="@drawable/no_ripple_background"
+            app:itemRippleColor="@android:color/transparent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

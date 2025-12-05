@@ -1,0 +1,38 @@
+<!-- item_valoracion.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textValoracion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Valoración" />
+
+    <TextView
+        android:id="@+id/textComentario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comentario" />
+
+    <TextView
+        android:id="@+id/textUsuario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Usuario" />
+
+    <!-- Checkbox para marcar si la valoración fue útil -->
+    <CheckBox
+        android:id="@+id/checkBoxUtil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¿Fue útil?" />
+
+    <Button
+        android:id="@+id/btnEnviarValoracion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enviar" />
+</LinearLayout>

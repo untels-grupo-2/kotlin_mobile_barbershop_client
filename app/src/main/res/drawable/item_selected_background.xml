@@ -1,0 +1,6 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo cuando el ítem está seleccionado -->
+    <item android:drawable="@color/color_selected_background" android:state_checked="true"/>
+    <!-- Fondo cuando el ítem no está seleccionado -->
+    <item android:drawable="@android:color/transparent"/>
+</selector>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#121212"
+    android:paddingTop="32dp"
+    android:paddingBottom="32dp">
+
+    <!-- Título principal "BRÍNDANOS TU OPINIÓN" -->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BRÍNDANOS TU OPINIÓN"
+        android:textColor="#FF9800"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="28dp"
+    android:layout_marginBottom="32dp" />
+
+    <!-- Título de la valoración -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¿Cómo calificarías el servicio?"
+        android:textColor="#FF9800"
+        android:textSize="20sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- RadioButtons para la valoración -->
+    <RadioGroup
+        android:id="@+id/radioGroupValoracion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="32dp">
+
+        <RadioButton
+            android:id="@+id/radio1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textColor="#FF9800"
+            android:buttonTint="#FF9800" />
+
+        <RadioButton
+            android:id="@+id/radio2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2"
+            android:textColor="#FF9800"
+            android:buttonTint="#FF9800" />
+
+        <RadioButton
+            android:id="@+id/radio3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3"
+            android:textColor="#FF9800"
+            android:buttonTint="#FF9800" />
+
+        <RadioButton
+            android:id="@+id/radio4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4"
+            android:textColor="#FF9800"
+            android:buttonTint="#FF9800" />
+
+        <RadioButton
+            android:id="@+id/radio5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5"
+            android:textColor="#FF9800"
+            android:buttonTint="#FF9800" />
+    </RadioGroup>
+
+    <!-- Texto de la segunda pregunta -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¿Te fue fácil realizar la reserva?"
+        android:textColor="#FF9800"
+        android:textSize="20sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- RadioGroup para la segunda pregunta -->
+    <RadioGroup
+        android:id="@+id/radioGroupFacilidad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="32dp">
+
+        <RadioButton
+            android:id="@+id/radioSi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sí"
+            android:textColor="#FF9800"
+            android:buttonTint="#FF9800" />
+
+        <RadioButton
+            android:id="@+id/radioNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No"
+            android:textColor="#FF9800"
+            android:buttonTint="#FF9800" />
+    </RadioGroup>
+
+    <!-- Campo de texto para comentarios -->
+    <EditText
+        android:id="@+id/editTextComentario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Brindanos tu opinión"
+        android:textColor="#FFFFFF"
+        android:background="#333333"
+        android:padding="12dp"
+        android:textColorHint="#FF9800"
+        android:inputType="text"
+        android:layout_marginBottom="32dp"/>
+
+    <!-- Botón para enviar la valoración -->
+    <Button
+        android:id="@+id/btnEnviarValoracion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enviar valoración"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FF9800"
+        android:layout_marginTop="16dp" />
+
+    <!-- Botón para cancelar -->
+    <Button
+        android:id="@+id/btnCancelar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cancelar"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#1E1E1E"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

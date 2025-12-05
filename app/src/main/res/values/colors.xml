@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue">#2196F3</color>
+    <color name="gray">#333333</color>
+    <color name="orange">#FF9800</color>
+    <color name="colorAccent">#FF5722</color>
+    <color name="color_selected">#FF5722</color>
+    <color name="color_unselected">#000000</color>
+    <color name="color_selected_background">#000000</color>
+    <color name="ripple_selected_color">#FFA500</color>
+    <color name="ripple_color">#FF5722</color> <!-- Color naranja o el que prefieras -->
+    <color name="cardBackground">#2C2C2C</color>
+    <color name="custom_orange">#FFA500</color>
+    <color name="selected_color">#FF9800</color> <!-- Naranja para el botón seleccionado -->
+    <color name="default_color">#6200EE</color>
+</resources>

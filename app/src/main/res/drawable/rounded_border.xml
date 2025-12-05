@@ -1,0 +1,11 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo de color blanco (puedes cambiarlo a cualquier color que desees) -->
+    <solid android:color="@android:color/white"/>
+
+    <!-- Borde redondeado -->
+    <corners android:radius="15dp"/>  <!-- Controla el radio de los bordes, ajusta el valor según lo que necesites -->
+
+    <!-- Opcional: Si deseas agregar un borde de color alrededor de la imagen -->
+    <stroke
+    android:width="2dp" />   <!-- Controla el grosor del borde -->
+</shape>

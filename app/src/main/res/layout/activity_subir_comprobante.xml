@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/fondo_parte_1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="16dp"
+        android:text="SUBIR COMPROBANTE"
+        app:layout_constraintBottom_toTopOf="@+id/imagePreview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <ImageView
+        android:id="@+id/imagePreview"
+        android:visibility="gone"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="32dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Vista previa de la imagen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"/>
+    <Button
+        android:textColor="#ffffff"
+        android:id="@+id/btnSeleccionarImagen"
+        android:layout_width="325dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:text="Seleccionar Imagen"
+        android:backgroundTint="#1e1e1e"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imagePreview"/>
+    <Button
+        android:textColor="#ffffff"
+        android:id="@+id/btnSubirComprobante"
+        android:layout_width="331dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="28dp"
+        android:text="Subir Comprobante"
+        android:backgroundTint="#ff9800"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSeleccionarImagen"/>
+    <Button
+        android:textColor="#ffffff"
+        android:id="@+id/btnCancelar"
+        android:layout_width="331dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="28dp"
+        android:text="Cancelar"
+        android:backgroundTint="#333333"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSubirComprobante"/>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:background="#333333"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:itemBackground="@drawable/no_ripple_background"
+        app:itemIconTint="@drawable/color_state_list"
+        app:itemRippleColor="@android:color/transparent"
+        app:itemTextColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

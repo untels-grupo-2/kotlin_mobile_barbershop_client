@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212">
+
+    <!-- ScrollView para hacer que la interfaz sea desplazable -->
+    <android.widget.ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:layout_gravity="center">
+
+            <!-- Título de la ventana emergente -->
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Realiza tu Reserva"
+                android:textColor="#FF9800"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:layout_marginTop="32dp"
+            android:layout_marginBottom="24dp" />
+
+            <!-- TextView para mostrar el barbero seleccionado -->
+            <TextView
+                android:id="@+id/textViewBarbero"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Barbero:"
+                android:textColor="#FF9800"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- TextView para mostrar el horario seleccionado -->
+            <TextView
+                android:id="@+id/textViewHorario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Horario:"
+                android:textColor="#FF9800"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- TextView para mostrar el servicio seleccionado -->
+            <TextView
+                android:id="@+id/textViewServicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Servicio:"
+                android:textColor="#FF9800"
+                android:textSize="18sp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- TextView para mostrar la fecha seleccionada -->
+            <TextView
+                android:id="@+id/textViewFecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha de la reserva"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/rounded_edittext"
+                android:textColorHint="#FF9800"
+                android:gravity="center"
+                android:layout_marginBottom="16dp"
+                android:textSize="16sp"/>
+
+            <!-- Campo para comentarios adicionales con borde redondeado -->
+            <EditText
+                android:id="@+id/editTextAdicionales"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Comentarios adicionales"
+                android:textColor="#FFFFFF"
+                android:background="#333333"
+                android:padding="12dp"
+                android:textColorHint="#FF9800"
+                android:inputType="text"
+                android:layout_marginBottom="32dp"/>
+
+            <!-- Botón para enviar la reserva con color de fondo y borde redondeado -->
+            <Button
+                android:id="@+id/btnEnviarReserva"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Enviar Reserva"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#FF9800"
+                android:textSize="18sp"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center" />
+
+            <!-- Nuevo Botón: Enviar Reserva con Recompensa -->
+            <Button
+                android:id="@+id/btnEnviarReservaRecompensa"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#B0BEC5"
+                android:text="Usar Recompensa"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <!-- Botón de Cancelar -->
+            <Button
+                android:id="@+id/btnCancelar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Cancelar"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1E1E1E"
+                android:layout_marginTop="16dp"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+    </android.widget.ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

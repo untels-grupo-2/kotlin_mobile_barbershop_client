@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@android:color/black">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/borde_naranja"
+        android:padding="16dp">
+
+        <!-- Imagen del barbero -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imagenBarbero"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:src="@drawable/perfil_default"
+            android:contentDescription="Imagen del Barbero"
+            app:shapeAppearanceOverlay="@style/CircularShape"
+            android:scaleType="centerCrop" />
+
+        <!-- Contenedor para el nombre y el RadioButton -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
+            <!-- Nombre del barbero -->
+            <TextView
+                android:id="@+id/nombreBarbero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:gravity="center"
+                android:text="Nombre del Barbero"
+                android:textColor="#FFA500"
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textViewDisponibilidad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NO DISPONIBLE"
+                android:textColor="#FF0000"
+                android:visibility="gone"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+        <!-- RadioButton para seleccionar el barbero -->
+        <RadioButton
+            android:id="@+id/radioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

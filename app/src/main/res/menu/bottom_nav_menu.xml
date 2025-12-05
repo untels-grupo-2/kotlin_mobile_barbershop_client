@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:statusBarColor="@color/black"
+    android:layout_height="match_parent"
+    android:background="#121212">
+
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="Inicio" />
+
+    <item
+        android:id="@+id/nav_servicios"
+        android:icon="@drawable/tijera"
+        android:title="Servicios" />
+
+    <item
+        android:id="@+id/historial"
+        android:icon="@drawable/historia"
+        android:title="Historial" />
+
+    <item
+        android:id="@+id/nav_perfil"
+        android:icon="@drawable/ic_profile"
+        android:title="Perfil" />
+
+</menu>

@@ -1,0 +1,79 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="160dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="15dp"
+    app:cardElevation="45dp"
+    android:backgroundTint="#212121">
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Imagen del servicio con bordes redondeados -->
+<ImageView
+android:id="@+id/imageServicio"
+android:layout_width="124dp"
+android:layout_height="170dp"
+android:layout_marginTop="20dp"
+android:layout_marginBottom="8dp"
+android:background="@drawable/rounded_border"
+android:clipToOutline="true"
+android:scaleType="centerCrop"
+android:src="@drawable/barberia1" />
+
+<TextView
+android:id="@+id/textNombreServicio"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="High Fade"
+android:textColor="#fff"
+android:textSize="18sp"
+android:textStyle="bold" />
+
+<TextView
+android:id="@+id/textPrecioServicio"
+android:layout_width="78dp"
+android:layout_height="wrap_content"
+android:layout_marginEnd="100dp"
+android:gravity="start"
+android:text="S/ 25.0"
+android:textColor="#FFC107"
+android:textStyle="bold" />
+
+    <!-- Descripción del servicio con límite de líneas -->
+<TextView
+android:id="@+id/textDescripcionServicio"
+android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:maxLines="3"
+    android:ellipsize="end"
+    android:gravity="start"
+    android:text="Descripción del servicio. Este es un servicio de corte de cabello..."
+    android:textColor="#fff"
+    android:textStyle="bold" />
+
+    <!-- Espacio flexible para que el botón quede al fondo -->
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:layout_weight="1"/>
+
+    <!-- Botón de Reservar con margen inferior -->
+<Button
+android:id="@+id/btnAviso"
+android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginBottom="1dp"
+    android:backgroundTint="#FF9800"
+    android:padding="10dp"
+    android:text="Reservar"
+    android:textColor="#000000"
+    android:textStyle="bold" />
+
+    </LinearLayout>
+    </androidx.cardview.widget.CardView>

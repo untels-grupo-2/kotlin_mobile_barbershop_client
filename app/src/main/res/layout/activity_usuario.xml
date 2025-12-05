@@ -1,0 +1,128 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/fondo_parte_1">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/activity_usuario"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Contenido principal en un ScrollView -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp"
+            android:background="@drawable/fondo_parte_1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/fondo_parte_1"
+                android:padding="24dp">
+
+                <!-- Imagen de perfil circular -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageUsuario"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/perfil_default"
+                    app:shapeAppearanceOverlay="@style/CircularShape"
+                    android:scaleType="centerCrop" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tu Información"
+                    android:textSize="28sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp"/>
+
+                <TextView
+                    android:id="@+id/textNombre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nombres*"
+                    android:background="@drawable/borde_naranja"
+                    android:textColor="#FFFFFF"
+                    android:padding="12dp"
+                    android:textColorHint="#AAAAAA"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:id="@+id/textEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Apellidos*"
+                    android:background="@drawable/borde_naranja"
+                    android:textColor="#FFFFFF"
+                    android:padding="12dp"
+                    android:textColorHint="#AAAAAA"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:id="@+id/textCelular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Correo*"
+                    android:background="@drawable/borde_naranja"
+                    android:textColor="#FFFFFF"
+                    android:padding="12dp"
+                    android:textColorHint="#AAAAAA"
+                    android:layout_marginBottom="16dp"/>
+
+                <Button
+                    android:id="@+id/buttonActualizarUsuario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Actualizar datos"
+                    android:textStyle="bold"
+                    android:backgroundTint="#FF9800"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginTop="24dp" />
+
+                <Button
+                    android:id="@+id/btnLogoutUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cerrar sesión"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#D32F2F"
+                    android:layout_marginTop="16dp"
+                    android:textStyle="bold"
+                    android:gravity="center" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Bottom Navigation View -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#333333"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:itemIconTint="@drawable/color_state_list"
+            app:itemTextColor="@color/white"
+            app:menu="@menu/bottom_nav_menu"
+            app:itemBackground="@drawable/no_ripple_background" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

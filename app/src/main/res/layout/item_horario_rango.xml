@@ -1,0 +1,11 @@
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/btnHorarioRango"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:layout_gravity="center"
+    android:layout_weight="1"
+    android:backgroundTint="#FF9800"
+    android:textColor="#FFFF"
+    android:padding="12dp"
+    android:text="9 AM - 10 AM" />
