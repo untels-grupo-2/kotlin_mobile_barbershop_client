@@ -2,6 +2,8 @@ package com.diamond.appcliente.api;
 
 import android.content.Context;
 
+import com.diamond.appcliente.BuildConfig;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -10,7 +12,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://192.168.1.76:8080/";
     public static Retrofit getRetrofit(Context context, boolean withAuth) {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)  // Espera para conectarse al servidor
@@ -22,7 +23,7 @@ public class ApiClient {
         }
 
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(BuildConfig.BASE_URL)
                 .client(clientBuilder.build())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
