@@ -11,6 +11,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -22,6 +25,7 @@ import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ClienteHomeActivity : AppCompatActivity() {
@@ -40,7 +44,6 @@ class ClienteHomeActivity : AppCompatActivity() {
 
     private var nombreCliente: String? = null
     private var apellidoCliente: String? = null
-    private var imagenUrlCliente: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +57,6 @@ class ClienteHomeActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerViewServicios)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
-        cargarServicios()
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = Color.BLACK
         }
@@ -65,65 +66,6 @@ class ClienteHomeActivity : AppCompatActivity() {
         findViewById<Button>(R.id.ColoracionButton).setOnClickListener { updateRecyclerView(filterServiciosByType("COLORACIÓN")) }
         findViewById<Button>(R.id.SkincareButton).setOnClickListener { updateRecyclerView(filterServiciosByType("SKINCARE")) }
         findViewById<Button>(R.id.AfeitadoButton).setOnClickListener { updateRecyclerView(filterServiciosByType("AFEITADO DE BARBA")) }
-
-        cargarDatosUsuario()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        listarReservaViewModel.getReservas().observe(this) { reservas ->
-            if (reservas != null) {
-                var count = reservas.count { it.estRecompensa == 0 }
-                if (count > 7) count = 7
-                updateMetaProgress(count)
-            }
-        }
-    }
-
-    private fun cargarDatosUsuario() {
-        usuarioViewModel.obtenerMiUsuario(object : UsuarioViewModel.UsuarioCallback {
-            override fun onSuccess(usuario: com.diamond.appcliente.dto.usuario.UsuarioDto?) {
-                usuario ?: return
-                nombreCliente = usuario.nombre
-                apellidoCliente = usuario.apellido
-                imagenUrlCliente = usuario.urlUsuario
-                clienteNombre.setText("${usuario.nombre} ${usuario.apellido}")
-                if (!imagenUrlCliente.isNullOrEmpty()) {
-                    Glide.with(this@ClienteHomeActivity).load(imagenUrlCliente).into(clienteFoto)
-                } else {
-                    clienteFoto.setImageResource(R.drawable.perfil_default)
-                }
-            }
-            override fun onError(str: String?) {}
-        })
-    }
-
-    private fun cargarServicios() {
-        viewModel1.obtenerServicios(object : GestionarServicioViewModel.ServicioCallback {
-            override fun onSuccess(servicios: List<ServicioDto>?) {
-                servicios ?: return
-                listaServicios = servicios
-                adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
-                    override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
-                        Log.d("IntentData", "nombreServicio: ${servicio.nombre}")
-                        Log.d("IntentData", "servicio_id: ${servicio.servicio_id}")
-                        val intent = Intent(this@ClienteHomeActivity, ListarRangoHorarios::class.java)
-                        intent.putExtra("nombreServicio", servicio.nombre)
-                        intent.putExtra("servicio_id", servicio.servicio_id)
-                        intent.putExtra("descripcionServicio", servicio.descripcion)
-                        intent.putExtra("precioServicio", servicio.precio)
-                        intent.putExtra("imagenServicio", imagenUrl)
-                        intent.putExtra("nombre", nombreCliente)
-                        intent.putExtra("apellido", apellidoCliente)
-                        startActivity(intent)
-                    }
-                })
-                recyclerView.adapter = adapter
-            }
-            override fun onError(mensaje: String?) {
-                Toast.makeText(this@ClienteHomeActivity, mensaje, Toast.LENGTH_SHORT).show()
-            }
-        })
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.nav_home
@@ -136,6 +78,66 @@ class ClienteHomeActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    usuarioViewModel.usuario.collect { usuario ->
+                        usuario ?: return@collect
+                        nombreCliente = usuario.nombre
+                        apellidoCliente = usuario.apellido
+                        clienteNombre.text = "${usuario.nombre} ${usuario.apellido}"
+                        if (!usuario.urlUsuario.isNullOrEmpty()) {
+                            Glide.with(this@ClienteHomeActivity).load(usuario.urlUsuario).into(clienteFoto)
+                        } else {
+                            clienteFoto.setImageResource(R.drawable.perfil_default)
+                        }
+                    }
+                }
+                launch {
+                    viewModel1.servicios.collect { servicios ->
+                        if (servicios.isEmpty()) return@collect
+                        listaServicios = servicios
+                        adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
+                            override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
+                                Log.d("IntentData", "nombreServicio: ${servicio.nombre} | servicio_id: ${servicio.servicio_id}")
+                                val intent = Intent(this@ClienteHomeActivity, ListarRangoHorarios::class.java)
+                                intent.putExtra("nombreServicio", servicio.nombre)
+                                intent.putExtra("servicio_id", servicio.servicio_id)
+                                intent.putExtra("descripcionServicio", servicio.descripcion)
+                                intent.putExtra("precioServicio", servicio.precio)
+                                intent.putExtra("imagenServicio", imagenUrl)
+                                intent.putExtra("nombre", nombreCliente)
+                                intent.putExtra("apellido", apellidoCliente)
+                                startActivity(intent)
+                            }
+                        })
+                        recyclerView.adapter = adapter
+                    }
+                }
+                launch {
+                    viewModel1.error.collect { msg ->
+                        Toast.makeText(this@ClienteHomeActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                launch {
+                    listarReservaViewModel.reservas.collect { reservas ->
+                        reservas ?: return@collect
+                        var count = reservas.count { it.estRecompensa == 0 }
+                        if (count > 7) count = 7
+                        updateMetaProgress(count)
+                    }
+                }
+            }
+        }
+
+        usuarioViewModel.obtenerMiUsuario()
+        viewModel1.cargarServicios()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        listarReservaViewModel.cargarReservas()
     }
 
     private fun filterServiciosByType(tipo: String): List<ServicioDto> =

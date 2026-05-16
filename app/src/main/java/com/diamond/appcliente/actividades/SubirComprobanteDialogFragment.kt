@@ -8,11 +8,15 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -46,6 +50,25 @@ class SubirComprobanteDialogFragment : DialogFragment() {
         return dialog
     }
 
+    override fun onStart() {
+        super.onStart()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    listarReservaViewModel.comprobanteEvento.collect { msg ->
+                        Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
+                        dismiss()
+                    }
+                }
+                launch {
+                    listarReservaViewModel.error.collect { msg ->
+                        Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
     private fun seleccionarImagen() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         intent.type = "image/*"
@@ -74,16 +97,7 @@ class SubirComprobanteDialogFragment : DialogFragment() {
                 "imagen", file.name,
                 RequestBody.create(MediaType.parse("image/*"), file)
             )
-
-            listarReservaViewModel.subirComprobante(reservaId, imagenPart, object : ListarReservaViewModel.ActualizarCallback {
-                override fun onSuccess(str: String) {
-                    Toast.makeText(activity, str, Toast.LENGTH_SHORT).show()
-                    dismiss()
-                }
-                override fun onError(str: String?) {
-                    Toast.makeText(activity, str, Toast.LENGTH_SHORT).show()
-                }
-            })
+            listarReservaViewModel.subirComprobante(reservaId, imagenPart)
         } catch (e: IOException) {
             Toast.makeText(activity, "Error al manejar la imagen", Toast.LENGTH_SHORT).show()
         }

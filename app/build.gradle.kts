@@ -84,4 +84,6 @@ dependencies {
     implementation ("androidx.recyclerview:recyclerview:1.2.1")
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.lifecycle.runtime.ktx)
 }

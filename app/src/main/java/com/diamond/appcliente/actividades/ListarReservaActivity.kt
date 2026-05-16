@@ -7,6 +7,9 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
@@ -14,6 +17,7 @@ import com.diamond.appcliente.adapters.ListarReservaAdapter
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ListarReservaActivity : AppCompatActivity() {
@@ -32,7 +36,6 @@ class ListarReservaActivity : AppCompatActivity() {
         listarReservaAdapter = ListarReservaAdapter()
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = listarReservaAdapter
-        loadReservations()
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.historial
@@ -46,17 +49,24 @@ class ListarReservaActivity : AppCompatActivity() {
         }
 
         window.statusBarColor = -16777216
-    }
 
-    private fun loadReservations() {
         progressBar.visibility = View.VISIBLE
-        listarReservaViewModel.getReservas().observe(this) { reservas ->
-            progressBar.visibility = View.GONE
-            if (reservas.isNullOrEmpty()) {
-                Toast.makeText(this, "No se encontraron reservas", Toast.LENGTH_SHORT).show()
-            } else {
-                listarReservaAdapter.submitList(reservas)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                listarReservaViewModel.reservas.collect { reservas ->
+                    if (reservas != null) {
+                        progressBar.visibility = View.GONE
+                        if (reservas.isEmpty()) {
+                            Toast.makeText(this@ListarReservaActivity, "No se encontraron reservas", Toast.LENGTH_SHORT).show()
+                        } else {
+                            listarReservaAdapter.submitList(reservas)
+                        }
+                    }
+                }
             }
         }
+
+        listarReservaViewModel.cargarReservas()
     }
 }

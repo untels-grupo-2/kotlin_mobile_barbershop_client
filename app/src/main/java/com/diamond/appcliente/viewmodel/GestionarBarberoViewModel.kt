@@ -1,16 +1,19 @@
 package com.diamond.appcliente.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.barbero.BarberoDto
 import com.diamond.appcliente.dto.barbero.BarberoRequest
-import com.diamond.appcliente.dto.barbero.BarberoResponse
-import com.diamond.appcliente.dto.barbero.BarberoSimpleResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,78 +21,75 @@ class GestionarBarberoViewModel @Inject constructor(
     @AuthenticatedApi private val authApiService: AuthApiService
 ) : ViewModel() {
 
-    interface BarberoCallback {
-        fun onSuccess(barberos: List<BarberoDto>?)
-        fun onError(mensaje: String?)
-    }
+    private val _barberos = MutableStateFlow<List<BarberoDto>>(emptyList())
+    val barberos: StateFlow<List<BarberoDto>> = _barberos.asStateFlow()
 
-    interface BarberoOperacionCallback {
-        fun onSuccess(mensaje: String?)
-        fun onError(mensaje: String?)
-    }
+    private val _mensaje = MutableSharedFlow<String>()
+    val mensaje: SharedFlow<String> = _mensaje.asSharedFlow()
 
-    interface ActualizarCallback {
-        fun onSuccess(mensaje: String?)
-        fun onError(mensaje: String?)
-    }
+    private val _error = MutableSharedFlow<String>()
+    val error: SharedFlow<String> = _error.asSharedFlow()
 
-    fun obtenerBarberos(callback: BarberoCallback) {
-        authApiService.listarBarberos().enqueue(object : Callback<BarberoResponse> {
-            override fun onResponse(call: Call<BarberoResponse>, response: Response<BarberoResponse>) {
+    fun cargarBarberos() {
+        viewModelScope.launch {
+            try {
+                val response = authApiService.listarBarberos()
                 if (response.isSuccessful && response.body() != null) {
-                    callback.onSuccess(response.body()!!.data)
+                    _barberos.value = response.body()!!.data ?: emptyList()
                 } else {
-                    callback.onError("Error al obtener barberos")
+                    _error.emit("Error al obtener barberos")
                 }
+            } catch (e: Exception) {
+                _error.emit(e.message ?: "Error desconocido")
             }
-            override fun onFailure(call: Call<BarberoResponse>, t: Throwable) {
-                callback.onError(t.message)
-            }
-        })
+        }
     }
 
-    fun crearBarbero(nombre: String, callback: BarberoOperacionCallback) {
-        authApiService.crearBarbero(BarberoRequest(nombre)).enqueue(object : Callback<BarberoResponse> {
-            override fun onResponse(call: Call<BarberoResponse>, response: Response<BarberoResponse>) {
+    fun crearBarbero(nombre: String) {
+        viewModelScope.launch {
+            try {
+                val response = authApiService.crearBarbero(BarberoRequest(nombre))
                 if (response.isSuccessful && response.body() != null) {
-                    callback.onSuccess(response.body()!!.message)
+                    _mensaje.emit(response.body()!!.message ?: "Barbero creado")
+                    cargarBarberos()
                 } else {
-                    callback.onError("Error al crear barbero")
+                    _error.emit("Error al crear barbero")
                 }
+            } catch (e: Exception) {
+                _error.emit(e.message ?: "Error desconocido")
             }
-            override fun onFailure(call: Call<BarberoResponse>, t: Throwable) {
-                callback.onError(t.message)
-            }
-        })
+        }
     }
 
-    fun actualizarBarbero(id: Int, nuevoNombre: String, callback: ActualizarCallback) {
-        authApiService.actualizarBarbero(id, BarberoRequest(nuevoNombre)).enqueue(object : Callback<BarberoSimpleResponse> {
-            override fun onResponse(call: Call<BarberoSimpleResponse>, response: Response<BarberoSimpleResponse>) {
+    fun actualizarBarbero(id: Int, nuevoNombre: String) {
+        viewModelScope.launch {
+            try {
+                val response = authApiService.actualizarBarbero(id, BarberoRequest(nuevoNombre))
                 if (response.isSuccessful && response.body() != null) {
-                    callback.onSuccess(response.body()!!.message)
+                    _mensaje.emit(response.body()!!.message ?: "Barbero actualizado")
+                    cargarBarberos()
                 } else {
-                    callback.onError("Error al actualizar barbero")
+                    _error.emit("Error al actualizar barbero")
                 }
+            } catch (e: Exception) {
+                _error.emit(e.message ?: "Error desconocido")
             }
-            override fun onFailure(call: Call<BarberoSimpleResponse>, t: Throwable) {
-                callback.onError(t.message)
-            }
-        })
+        }
     }
 
-    fun eliminarBarbero(id: Int, callback: BarberoOperacionCallback) {
-        authApiService.eliminarBarbero(id).enqueue(object : Callback<BarberoResponse> {
-            override fun onResponse(call: Call<BarberoResponse>, response: Response<BarberoResponse>) {
+    fun eliminarBarbero(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = authApiService.eliminarBarbero(id)
                 if (response.isSuccessful && response.body() != null) {
-                    callback.onSuccess(response.body()!!.message)
+                    _mensaje.emit(response.body()!!.message ?: "Barbero eliminado")
+                    cargarBarberos()
                 } else {
-                    callback.onError("Error al eliminar barbero")
+                    _error.emit("Error al eliminar barbero")
                 }
+            } catch (e: Exception) {
+                _error.emit(e.message ?: "Error desconocido")
             }
-            override fun onFailure(call: Call<BarberoResponse>, t: Throwable) {
-                callback.onError(t.message)
-            }
-        })
+        }
     }
 }

@@ -5,14 +5,17 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
-import com.diamond.appcliente.dto.servicio.ServicioDto
 import com.diamond.appcliente.dto.servicio.ServicioRequest
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class GestionarServicioActivity : AppCompatActivity() {
@@ -30,51 +33,42 @@ class GestionarServicioActivity : AppCompatActivity() {
         recyclerView.layoutManager = GridLayoutManager(this, 2)
         btnAgregarServicio = findViewById(R.id.btnAgregarServicio)
 
-        viewModel.obtenerServicios(object : GestionarServicioViewModel.ServicioCallback {
-            override fun onSuccess(servicios: List<ServicioDto>?) {
-                servicios ?: return
-                if (adapter == null) {
-                    adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
-                        override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {}
-                    })
-                    recyclerView.adapter = adapter
-                } else {
-                    adapter!!.notifyDataSetChanged()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.servicios.collect { servicios ->
+                        if (servicios.isEmpty()) return@collect
+                        if (adapter == null) {
+                            adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
+                                override fun onAviso(servicio: com.diamond.appcliente.dto.servicio.ServicioDto, imagenUrl: String?) {}
+                            })
+                            recyclerView.adapter = adapter
+                        } else {
+                            adapter!!.notifyDataSetChanged()
+                        }
+                    }
+                }
+                launch {
+                    viewModel.mensaje.collect { msg ->
+                        Toast.makeText(this@GestionarServicioActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                launch {
+                    viewModel.error.collect { msg ->
+                        Toast.makeText(this@GestionarServicioActivity, "Error: $msg", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
-            override fun onError(mensaje: String?) {
-                Toast.makeText(this@GestionarServicioActivity, "Error: $mensaje", Toast.LENGTH_SHORT).show()
-            }
-        })
+        }
+
+        viewModel.cargarServicios()
     }
 
     private fun crearNuevoServicio(nombre: String, precio: Double, descripcion: String, tipoServicioId: Int) {
-        viewModel.crearServicio(ServicioRequest(nombre, precio, descripcion, tipoServicioId), object : GestionarServicioViewModel.ServicioOperacionCallback {
-            override fun onSuccess(mensaje: String?) {
-                Toast.makeText(this@GestionarServicioActivity, mensaje, Toast.LENGTH_SHORT).show()
-                viewModel.obtenerServicios(object : GestionarServicioViewModel.ServicioCallback {
-                    override fun onSuccess(servicios: List<ServicioDto>?) { adapter?.notifyDataSetChanged() }
-                    override fun onError(mensaje: String?) { Toast.makeText(this@GestionarServicioActivity, "Error: $mensaje", Toast.LENGTH_SHORT).show() }
-                })
-            }
-            override fun onError(mensaje: String?) {
-                Toast.makeText(this@GestionarServicioActivity, "Error: $mensaje", Toast.LENGTH_SHORT).show()
-            }
-        })
+        viewModel.crearServicio(ServicioRequest(nombre, precio, descripcion, tipoServicioId))
     }
 
     private fun eliminarServicio(id: Int) {
-        viewModel.eliminarServicio(id, object : GestionarServicioViewModel.ServicioOperacionCallback {
-            override fun onSuccess(mensaje: String?) {
-                Toast.makeText(this@GestionarServicioActivity, mensaje, Toast.LENGTH_SHORT).show()
-                viewModel.obtenerServicios(object : GestionarServicioViewModel.ServicioCallback {
-                    override fun onSuccess(servicios: List<ServicioDto>?) { adapter?.notifyDataSetChanged() }
-                    override fun onError(mensaje: String?) { Toast.makeText(this@GestionarServicioActivity, "Error: $mensaje", Toast.LENGTH_SHORT).show() }
-                })
-            }
-            override fun onError(mensaje: String?) {
-                Toast.makeText(this@GestionarServicioActivity, "Error: $mensaje", Toast.LENGTH_SHORT).show()
-            }
-        })
+        viewModel.eliminarServicio(id)
     }
 }

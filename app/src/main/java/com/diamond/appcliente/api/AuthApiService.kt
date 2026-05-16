@@ -23,83 +23,85 @@ import com.diamond.appcliente.dto.valoracion.ValoracionResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 interface AuthApiService {
 
     @POST("api/auth/login")
-    fun login(@Body loginRequest: LoginRequest): Call<LoginResponse>
+    suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
     @POST("api/auth/register")
-    fun register(@Body registerRequest: LoginRequest): Call<Void>
+    suspend fun register(@Body registerRequest: LoginRequest): Response<Void>
 
+    // Keep as Call<T> — used synchronously in TokenManager inside OkHttp interceptor
     @POST("api/auth/refreshToken")
     fun refresh(@Body refreshRequest: RefreshRequest): Call<LoginResponse>
 
     @POST("emailPassword/sendEmail")
-    fun recuperarContraseña(@Body recuperacionRequest: RecuperacionRequest): Call<RecuperacionResponse>
+    suspend fun recuperarContraseña(@Body recuperacionRequest: RecuperacionRequest): Response<RecuperacionResponse>
 
     @GET("api/barbero/listar")
-    fun listarBarberos(): Call<BarberoResponse>
+    suspend fun listarBarberos(): Response<BarberoResponse>
 
     @POST("api/barbero/crear")
-    fun crearBarbero(@Body request: BarberoRequest): Call<BarberoResponse>
+    suspend fun crearBarbero(@Body request: BarberoRequest): Response<BarberoResponse>
 
     @DELETE("api/barbero/eliminar/{id}")
-    fun eliminarBarbero(@Path("id") id: Int): Call<BarberoResponse>
+    suspend fun eliminarBarbero(@Path("id") id: Int): Response<BarberoResponse>
 
     @PUT("api/barbero/actualizar/{id}")
-    fun actualizarBarbero(@Path("id") id: Int, @Body barberoRequest: BarberoRequest): Call<BarberoSimpleResponse>
+    suspend fun actualizarBarbero(@Path("id") id: Int, @Body barberoRequest: BarberoRequest): Response<BarberoSimpleResponse>
 
     @GET("api/servicio/listar")
-    fun listarServicios(): Call<ServicioResponse>
+    suspend fun listarServicios(): Response<ServicioResponse>
 
     @POST("api/servicio/crear")
-    fun crearServicio(@Body request: ServicioRequest): Call<ServicioResponse>
+    suspend fun crearServicio(@Body request: ServicioRequest): Response<ServicioResponse>
 
     @DELETE("api/servicio/eliminar/{id}")
-    fun eliminarServicio(@Path("id") id: Int): Call<ServicioResponse>
+    suspend fun eliminarServicio(@Path("id") id: Int): Response<ServicioResponse>
 
     @PUT("api/servicio/actualizar/{id}")
-    fun actualizarServicio(@Path("id") id: Int, @Body request: ServicioRequest): Call<ServicioSimpleResponse>
+    suspend fun actualizarServicio(@Path("id") id: Int, @Body request: ServicioRequest): Response<ServicioSimpleResponse>
 
     @POST("api/valoracion/crear")
-    fun crearValoracion(@Body valoracionRequest: ValoracionRequest): Call<ValoracionResponse>
+    suspend fun crearValoracion(@Body valoracionRequest: ValoracionRequest): Response<ValoracionResponse>
 
     @GET("api/rango/listar")
-    fun obtenerHorariosRangos(@Query("tipoHorarioId") tipoHorarioId: Int): Call<HorarioRangoResponse>
+    suspend fun obtenerHorariosRangos(@Query("tipoHorarioId") tipoHorarioId: Int): Response<HorarioRangoResponse>
 
     @GET("api/usuario/listarme")
-    fun obtenerMiUsuario(): Call<UsuarioResponse>
+    suspend fun obtenerMiUsuario(): Response<UsuarioResponse>
 
     @GET("api/reserva/barberos-disponibles")
-    fun obtenerBarberosDisponibles(
+    suspend fun obtenerBarberosDisponibles(
         @Header("Authorization") token: String,
         @Query("fecha") fecha: String,
         @Query("tipoHorarioId") tipoHorarioId: Long,
         @Query("horarioRangoId") horarioRangoId: Long
-    ): Call<BarberoListResponse>
+    ): Response<BarberoListResponse>
 
     @POST("api/reserva/crear")
-    fun crearReserva(@Body dtoReserva: DtoReserva): Call<ReservaResponse>
+    suspend fun crearReserva(@Body dtoReserva: DtoReserva): Response<ReservaResponse>
 
     @GET("api/reserva/mis-reservas")
-    fun listarMisReservas(): Call<ReservaListResponse>
+    suspend fun listarMisReservas(): Response<ReservaListResponse>
 
     @POST("api/reserva/crearReservaRecompensa")
-    fun crearReservaRecompensa(@Body dtoReserva: DtoReserva): Call<ReservaResponse>
+    suspend fun crearReservaRecompensa(@Body dtoReserva: DtoReserva): Response<ReservaResponse>
 
     @Multipart
     @PUT("api/usuario/actualizar-mi-perfil")
-    fun actualizarMiPerfil(
+    suspend fun actualizarMiPerfil(
         @Part("dtoUsuario") requestBody: RequestBody,
         @Part part: MultipartBody.Part
-    ): Call<ApiResponse<Any>>
+    ): Response<ApiResponse<Any>>
 
     @Multipart
     @POST("api/reserva/subir-comprobante/{reservaId}")
-    fun subirComprobante(
+    suspend fun subirComprobante(
         @Path("reservaId") reservaId: Long,
         @Part part: MultipartBody.Part
-    ): Call<ApiResponse<Any>>
+    ): Response<ApiResponse<Any>>
 }

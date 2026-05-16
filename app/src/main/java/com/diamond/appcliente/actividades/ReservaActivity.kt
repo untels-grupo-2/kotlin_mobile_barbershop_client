@@ -12,12 +12,16 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.reserva.DtoReserva
 import com.diamond.appcliente.viewmodel.GestionarReservaViewModel
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -73,8 +77,6 @@ class ReservaActivity : AppCompatActivity() {
             window.statusBarColor = Color.BLACK
         }
 
-        verificarReservas()
-
         btnEnviarReserva.setOnClickListener { enviarReserva(barberoId) }
         btnEnviarReservaRecompensa.setOnClickListener { enviarReservaRecompensa(barberoId) }
 
@@ -82,14 +84,27 @@ class ReservaActivity : AppCompatActivity() {
             startActivity(Intent(this, ClienteHomeActivity::class.java))
             finish()
         }
-    }
 
-    private fun verificarReservas() {
-        listarReservaViewModel.getReservas().observe(this) { reservas ->
-            if (reservas != null) {
-                activarBotonReservaRecompensa(reservas.count { it.estRecompensa == 0 } >= 7)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    listarReservaViewModel.reservas.collect { reservas ->
+                        reservas ?: return@collect
+                        activarBotonReservaRecompensa(reservas.count { it.estRecompensa == 0 } >= 7)
+                    }
+                }
+                launch {
+                    reservaViewModel.evento.collect { evento ->
+                        when (evento) {
+                            is GestionarReservaViewModel.ReservaUiEvent.Exito -> mostrarDialogoExito()
+                            is GestionarReservaViewModel.ReservaUiEvent.Error -> Toast.makeText(this@ReservaActivity, evento.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             }
         }
+
+        listarReservaViewModel.cargarReservas()
     }
 
     private fun activarBotonReservaRecompensa(activar: Boolean) {
@@ -124,18 +139,12 @@ class ReservaActivity : AppCompatActivity() {
     private fun enviarReserva(barberoId: Long) {
         val request = DtoReserva(barberoId, horarioRangoId, textViewFecha.text.toString(), servicio_id, editTextAdicionales.text.toString())
         Log.d("Reserva", "Datos de la reserva: ${Gson().toJson(request)}")
-        reservaViewModel.enviarReserva(request, object : GestionarReservaViewModel.ReservaCallback {
-            override fun onSuccess(message: String) { mostrarDialogoExito() }
-            override fun onError(message: String) { Toast.makeText(this@ReservaActivity, "Error: $message", Toast.LENGTH_SHORT).show() }
-        })
+        reservaViewModel.enviarReserva(request)
     }
 
     private fun enviarReservaRecompensa(barberoId: Long) {
         val request = DtoReserva(barberoId, horarioRangoId, textViewFecha.text.toString(), servicio_id, editTextAdicionales.text.toString())
         Log.d("Reserva", "Datos de la reserva con recompensa: ${Gson().toJson(request)}")
-        reservaViewModel.crearReservaRecompensa(request, object : GestionarReservaViewModel.ReservaCallback {
-            override fun onSuccess(message: String) { mostrarDialogoExito() }
-            override fun onError(message: String) { Toast.makeText(this@ReservaActivity, "Error: $message", Toast.LENGTH_SHORT).show() }
-        })
+        reservaViewModel.crearReservaRecompensa(request)
     }
 }

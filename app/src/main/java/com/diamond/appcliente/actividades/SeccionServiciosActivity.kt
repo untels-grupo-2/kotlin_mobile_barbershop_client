@@ -9,6 +9,9 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.auth0.android.jwt.JWT
@@ -19,6 +22,7 @@ import com.diamond.appcliente.util.PreferenciasHelper
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,7 +37,6 @@ class SeccionServiciosActivity : AppCompatActivity() {
 
     private var nombreCliente: String? = null
     private var apellidoCliente: String? = null
-    private var imagenUrlCliente: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +46,9 @@ class SeccionServiciosActivity : AppCompatActivity() {
         val jwt = JWT(token!!)
         nombreCliente = jwt.getClaim("nombre").asString()
         apellidoCliente = jwt.getClaim("apellido").asString()
-        imagenUrlCliente = jwt.getClaim("urlUsuario").asString()
 
         recyclerView = findViewById(R.id.recyclerViewServicios)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-
-        cargarServicios()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = Color.BLACK
@@ -59,33 +59,6 @@ class SeccionServiciosActivity : AppCompatActivity() {
         findViewById<Button>(R.id.ColoracionButton).setOnClickListener { updateRecyclerView(filterServiciosByType("COLORACIÓN")) }
         findViewById<Button>(R.id.SkincareButton).setOnClickListener { updateRecyclerView(filterServiciosByType("SKINCARE")) }
         findViewById<Button>(R.id.AfeitadoButton).setOnClickListener { updateRecyclerView(filterServiciosByType("AFEITADO DE BARBA")) }
-    }
-
-    private fun cargarServicios() {
-        viewModel1.obtenerServicios(object : GestionarServicioViewModel.ServicioCallback {
-            override fun onSuccess(servicios: List<ServicioDto>?) {
-                servicios ?: return
-                listaServicios = servicios
-                adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
-                    override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
-                        Log.d("IntentData", "nombreServicio: ${servicio.nombre} | servicio_id: ${servicio.servicio_id}")
-                        val intent = Intent(this@SeccionServiciosActivity, ListarRangoHorarios::class.java)
-                        intent.putExtra("nombreServicio", servicio.nombre)
-                        intent.putExtra("servicio_id", servicio.servicio_id)
-                        intent.putExtra("descripcionServicio", servicio.descripcion)
-                        intent.putExtra("precioServicio", servicio.precio)
-                        intent.putExtra("imagenServicio", imagenUrl)
-                        intent.putExtra("nombre", nombreCliente)
-                        intent.putExtra("apellido", apellidoCliente)
-                        startActivity(intent)
-                    }
-                })
-                recyclerView.adapter = adapter
-            }
-            override fun onError(mensaje: String?) {
-                Toast.makeText(this@SeccionServiciosActivity, mensaje, Toast.LENGTH_SHORT).show()
-            }
-        })
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.nav_servicios
@@ -98,6 +71,39 @@ class SeccionServiciosActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel1.servicios.collect { servicios ->
+                        if (servicios.isEmpty()) return@collect
+                        listaServicios = servicios
+                        adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
+                            override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
+                                Log.d("IntentData", "nombreServicio: ${servicio.nombre} | servicio_id: ${servicio.servicio_id}")
+                                val intent = Intent(this@SeccionServiciosActivity, ListarRangoHorarios::class.java)
+                                intent.putExtra("nombreServicio", servicio.nombre)
+                                intent.putExtra("servicio_id", servicio.servicio_id)
+                                intent.putExtra("descripcionServicio", servicio.descripcion)
+                                intent.putExtra("precioServicio", servicio.precio)
+                                intent.putExtra("imagenServicio", imagenUrl)
+                                intent.putExtra("nombre", nombreCliente)
+                                intent.putExtra("apellido", apellidoCliente)
+                                startActivity(intent)
+                            }
+                        })
+                        recyclerView.adapter = adapter
+                    }
+                }
+                launch {
+                    viewModel1.error.collect { msg ->
+                        Toast.makeText(this@SeccionServiciosActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        viewModel1.cargarServicios()
     }
 
     private fun filterServiciosByType(tipo: String): List<ServicioDto> =

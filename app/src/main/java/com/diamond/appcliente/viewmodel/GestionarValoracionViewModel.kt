@@ -1,14 +1,15 @@
 package com.diamond.appcliente.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.valoracion.ValoracionRequest
-import com.diamond.appcliente.dto.valoracion.ValoracionResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,23 +17,26 @@ class GestionarValoracionViewModel @Inject constructor(
     @AuthenticatedApi private val authApiService: AuthApiService
 ) : ViewModel() {
 
-    interface ValoracionCallback {
-        fun onSuccess(message: String)
-        fun onError(message: String?)
+    sealed class ValoracionUiEvent {
+        data class Exito(val message: String) : ValoracionUiEvent()
+        data class Error(val message: String) : ValoracionUiEvent()
     }
 
-    fun enviarValoracion(request: ValoracionRequest, callback: ValoracionCallback) {
-        authApiService.crearValoracion(request).enqueue(object : Callback<ValoracionResponse> {
-            override fun onResponse(call: Call<ValoracionResponse>, response: Response<ValoracionResponse>) {
+    private val _evento = MutableSharedFlow<ValoracionUiEvent>()
+    val evento: SharedFlow<ValoracionUiEvent> = _evento.asSharedFlow()
+
+    fun enviarValoracion(request: ValoracionRequest) {
+        viewModelScope.launch {
+            try {
+                val response = authApiService.crearValoracion(request)
                 if (response.isSuccessful) {
-                    callback.onSuccess("Valoración enviada con éxito")
+                    _evento.emit(ValoracionUiEvent.Exito("Valoración enviada con éxito"))
                 } else {
-                    callback.onError("Error al enviar la valoración")
+                    _evento.emit(ValoracionUiEvent.Error("Error al enviar la valoración"))
                 }
+            } catch (e: Exception) {
+                _evento.emit(ValoracionUiEvent.Error(e.message ?: "Error desconocido"))
             }
-            override fun onFailure(call: Call<ValoracionResponse>, t: Throwable) {
-                callback.onError(t.message)
-            }
-        })
+        }
     }
 }

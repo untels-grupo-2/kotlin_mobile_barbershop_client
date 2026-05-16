@@ -14,10 +14,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -70,6 +74,24 @@ class SubirComprobanteActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    listarReservaViewModel.comprobanteEvento.collect { msg ->
+                        Log.d("SubirComprobanteActivity", "Comprobante subido exitosamente.")
+                        Toast.makeText(this@SubirComprobanteActivity, msg, Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                }
+                launch {
+                    listarReservaViewModel.error.collect { msg ->
+                        Log.e("SubirComprobanteActivity", "Error al subir el comprobante: $msg")
+                        Toast.makeText(this@SubirComprobanteActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -114,18 +136,7 @@ class SubirComprobanteActivity : AppCompatActivity() {
                 "imagen", file.name,
                 RequestBody.create(MediaType.parse("image/*"), file)
             )
-
-            listarReservaViewModel.subirComprobante(reservaId, imagenPart, object : ListarReservaViewModel.ActualizarCallback {
-                override fun onSuccess(str: String) {
-                    Log.d("SubirComprobanteActivity", "Comprobante subido exitosamente.")
-                    Toast.makeText(this@SubirComprobanteActivity, str, Toast.LENGTH_SHORT).show()
-                    finish()
-                }
-                override fun onError(str: String?) {
-                    Log.e("SubirComprobanteActivity", "Error al subir el comprobante: $str")
-                    Toast.makeText(this@SubirComprobanteActivity, str, Toast.LENGTH_SHORT).show()
-                }
-            })
+            listarReservaViewModel.subirComprobante(reservaId, imagenPart)
         } catch (e: IOException) {
             Log.e("SubirComprobanteActivity", "Error al manejar la imagen", e)
             Toast.makeText(this, "Error al manejar la imagen", Toast.LENGTH_SHORT).show()

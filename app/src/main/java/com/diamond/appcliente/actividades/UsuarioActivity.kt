@@ -15,6 +15,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.auth0.android.jwt.JWT
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
@@ -23,6 +26,7 @@ import com.diamond.appcliente.util.PreferenciasHelper
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -52,19 +56,7 @@ class UsuarioActivity : AppCompatActivity() {
         if (token != null) {
             Log.d("UsuarioActivity", "Token recibido: $token")
             JWT(token)
-            viewModel.obtenerMiUsuario(object : UsuarioViewModel.UsuarioCallback {
-                override fun onSuccess(usuario: UsuarioDto?) {
-                    usuario ?: return
-                    textNombre.text = "${usuario.nombre} ${usuario.apellido}"
-                    textEmail.text = usuario.email
-                    textCelular.text = usuario.celular
-                    Glide.with(this@UsuarioActivity).load(usuario.urlUsuario)
-                        .placeholder(R.drawable.perfil_default).into(imageUsuario)
-                }
-                override fun onError(mensaje: String?) {
-                    Toast.makeText(this@UsuarioActivity, "Error al cargar usuario: $mensaje", Toast.LENGTH_SHORT).show()
-                }
-            })
+            viewModel.obtenerMiUsuario()
         } else {
             Log.d("UsuarioActivity", "Token no encontrado")
         }
@@ -85,6 +77,31 @@ class UsuarioActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.usuario.collect { usuario ->
+                        usuario ?: return@collect
+                        textNombre.text = "${usuario.nombre} ${usuario.apellido}"
+                        textEmail.text = usuario.email
+                        textCelular.text = usuario.celular
+                        Glide.with(this@UsuarioActivity).load(usuario.urlUsuario)
+                            .placeholder(R.drawable.perfil_default).into(imageUsuario)
+                    }
+                }
+                launch {
+                    viewModel.actualizarEvento.collect { msg ->
+                        Toast.makeText(this@UsuarioActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                launch {
+                    viewModel.error.collect { msg ->
+                        Toast.makeText(this@UsuarioActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun mostrarPopupActualizar() {
@@ -97,18 +114,13 @@ class UsuarioActivity : AppCompatActivity() {
         val editTextCelular = popupView.findViewById<EditText>(R.id.etCelularUsuario)
 
         if (preferenciasHelper.obtenerToken() != null) {
-            viewModel.obtenerMiUsuario(object : UsuarioViewModel.UsuarioCallback {
-                override fun onSuccess(usuario: UsuarioDto?) {
-                    usuario ?: return
-                    editTextNombre.setText(usuario.nombre)
-                    editTextApellido.setText(usuario.apellido)
-                    editTextEmail.setText(usuario.email)
-                    editTextCelular.setText(usuario.celular)
-                }
-                override fun onError(mensaje: String?) {
-                    Toast.makeText(this@UsuarioActivity, "Error al cargar usuario: $mensaje", Toast.LENGTH_SHORT).show()
-                }
-            })
+            val u = viewModel.usuario.value
+            if (u != null) {
+                editTextNombre.setText(u.nombre)
+                editTextApellido.setText(u.apellido)
+                editTextEmail.setText(u.email)
+                editTextCelular.setText(u.celular)
+            }
         }
 
         popupView.findViewById<Button>(R.id.btnSeleccionarImagenUsuario).setOnClickListener { seleccionarImagen() }
@@ -126,11 +138,7 @@ class UsuarioActivity : AppCompatActivity() {
                     this.email = email
                     this.celular = celular
                 }
-                if (imagenSeleccionadaUri != null) {
-                    actualizarUsuarioConImagen(dtoUsuario, imagenSeleccionadaUri!!)
-                } else {
-                    actualizarUsuario(dtoUsuario)
-                }
+                viewModel.actualizarMiPerfil(dtoUsuario, imagenSeleccionadaUri)
                 popupWindow.dismiss()
             } else {
                 Toast.makeText(this, "El número de celular debe tener 9 dígitos.", Toast.LENGTH_SHORT).show()
@@ -157,32 +165,6 @@ class UsuarioActivity : AppCompatActivity() {
         }
     }
 
-    private fun actualizarUsuario(dtoUsuario: UsuarioDto) {
-        if (preferenciasHelper.obtenerToken() == null) return
-        viewModel.actualizarMiPerfil(dtoUsuario, null, object : UsuarioViewModel.ActualizarCallback {
-            override fun onSuccess(str: String) {
-                Toast.makeText(this@UsuarioActivity, str, Toast.LENGTH_SHORT).show()
-                cargarUsuario()
-            }
-            override fun onError(str: String?) {
-                Toast.makeText(this@UsuarioActivity, str, Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun actualizarUsuarioConImagen(dtoUsuario: UsuarioDto, imagenUri: Uri) {
-        if (preferenciasHelper.obtenerToken() == null) return
-        viewModel.actualizarMiPerfil(dtoUsuario, imagenUri, object : UsuarioViewModel.ActualizarCallback {
-            override fun onSuccess(str: String) {
-                Toast.makeText(this@UsuarioActivity, str, Toast.LENGTH_SHORT).show()
-                cargarUsuario()
-            }
-            override fun onError(str: String?) {
-                Toast.makeText(this@UsuarioActivity, str, Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
     private fun cerrarSesion() {
         preferenciasHelper.limpiarPreferencias()
         Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
@@ -190,21 +172,5 @@ class UsuarioActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
         finish()
-    }
-
-    private fun cargarUsuario() {
-        if (preferenciasHelper.obtenerToken() == null) return
-        viewModel.obtenerMiUsuario(object : UsuarioViewModel.UsuarioCallback {
-            override fun onSuccess(usuario: UsuarioDto?) {
-                usuario ?: return
-                textNombre.text = "${usuario.nombre} ${usuario.apellido}"
-                textEmail.text = usuario.email
-                textCelular.text = usuario.celular
-                Glide.with(this@UsuarioActivity).load(usuario.urlUsuario).into(imageUsuario)
-            }
-            override fun onError(mensaje: String?) {
-                Toast.makeText(this@UsuarioActivity, "Error al cargar usuario: $mensaje", Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 }

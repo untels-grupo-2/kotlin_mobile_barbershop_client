@@ -12,6 +12,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
@@ -22,6 +25,7 @@ import com.diamond.appcliente.viewmodel.GestionarHorarioRangoViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -81,8 +85,6 @@ class ListarRangoHorarios : AppCompatActivity() {
         })
         recyclerView.adapter = horarioRangoAdapter
 
-        obtenerHorarios()
-
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.nav_home
         bottomNavigationView.setOnItemSelectedListener { item ->
@@ -94,6 +96,32 @@ class ListarRangoHorarios : AppCompatActivity() {
                 else -> false
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    gestionarHorarioRangoViewModel.horarios.collect { horarios ->
+                        if (horarios.isEmpty()) return@collect
+                        val todosHorarios = mutableListOf<HorarioRangoDto>()
+                        todosHorarios.add(HorarioRangoDto("🌅 Turno mañana", "Encabezado"))
+                        horarios.filter { it.tipoHorario == "MAÑANA" }.forEach { todosHorarios.add(it) }
+                        todosHorarios.add(HorarioRangoDto("☀️ Turno tarde", "Encabezado"))
+                        horarios.filter { it.tipoHorario == "TARDE" }.forEach { todosHorarios.add(it) }
+                        todosHorarios.add(HorarioRangoDto("🌙 Turno noche", "Encabezado"))
+                        horarios.filter { it.tipoHorario == "NOCHE" }.forEach { todosHorarios.add(it) }
+                        ordenarHorarios(todosHorarios)
+                        setUpRecyclerView(todosHorarios)
+                    }
+                }
+                launch {
+                    gestionarHorarioRangoViewModel.error.collect { msg ->
+                        Toast.makeText(this@ListarRangoHorarios, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        gestionarHorarioRangoViewModel.cargarHorarios(1)
     }
 
     private fun mostrarCalendario() {
@@ -123,28 +151,6 @@ class ListarRangoHorarios : AppCompatActivity() {
         datePickerDialog.datePicker.minDate = System.currentTimeMillis()
         datePickerDialog.datePicker.maxDate = endOfWeekCalendar.timeInMillis
         datePickerDialog.show()
-    }
-
-    private fun obtenerHorarios() {
-        gestionarHorarioRangoViewModel.obtenerHorariosRangos(1, object : GestionarHorarioRangoViewModel.HorarioRangoCallback {
-            override fun onSuccess(horarioRangos: List<HorarioRangoDto>?) {
-                horarioRangos ?: return
-                val todosHorarios = mutableListOf<HorarioRangoDto>()
-
-                todosHorarios.add(HorarioRangoDto("🌅 Turno mañana", "Encabezado"))
-                horarioRangos.filter { it.tipoHorario == "MAÑANA" }.forEach { todosHorarios.add(it) }
-                todosHorarios.add(HorarioRangoDto("☀️ Turno tarde", "Encabezado"))
-                horarioRangos.filter { it.tipoHorario == "TARDE" }.forEach { todosHorarios.add(it) }
-                todosHorarios.add(HorarioRangoDto("🌙 Turno noche", "Encabezado"))
-                horarioRangos.filter { it.tipoHorario == "NOCHE" }.forEach { todosHorarios.add(it) }
-
-                ordenarHorarios(todosHorarios)
-                setUpRecyclerView(todosHorarios)
-            }
-            override fun onError(mensaje: String?) {
-                Toast.makeText(this@ListarRangoHorarios, mensaje, Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 
     private fun setUpRecyclerView(horarioRangos: List<HorarioRangoDto>) {

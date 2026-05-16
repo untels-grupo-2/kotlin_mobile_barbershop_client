@@ -1,19 +1,20 @@
 package com.diamond.appcliente.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.di.AuthenticatedApi
-import com.diamond.appcliente.dto.common.ApiResponse
-import com.diamond.appcliente.dto.reserva.ReservaListResponse
 import com.diamond.appcliente.dto.reserva.ReservaResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,50 +22,47 @@ class ListarReservaViewModel @Inject constructor(
     @AuthenticatedApi private val apiService: AuthApiService
 ) : ViewModel() {
 
-    interface ActualizarCallback {
-        fun onSuccess(str: String)
-        fun onError(str: String?)
-    }
+    private val _reservas = MutableStateFlow<List<ReservaResponse>?>(null)
+    val reservas: StateFlow<List<ReservaResponse>?> = _reservas.asStateFlow()
 
-    val reservasLiveData = MutableLiveData<List<ReservaResponse>?>()
+    private val _comprobanteEvento = MutableSharedFlow<String>()
+    val comprobanteEvento: SharedFlow<String> = _comprobanteEvento.asSharedFlow()
 
-    fun getReservas(): LiveData<List<ReservaResponse>?> {
-        loadReservations()
-        return reservasLiveData
-    }
+    private val _error = MutableSharedFlow<String>()
+    val error: SharedFlow<String> = _error.asSharedFlow()
 
-    private fun loadReservations() {
-        Log.d("ListarReservaViewModel", "Haciendo llamada a la API para obtener reservas...")
-        apiService.listarMisReservas().enqueue(object : Callback<ReservaListResponse> {
-            override fun onResponse(call: Call<ReservaListResponse>, response: Response<ReservaListResponse>) {
-                Log.d("ListarReservaViewModel", "Respuesta de la API: ${response.code()}")
+    fun cargarReservas() {
+        viewModelScope.launch {
+            _reservas.value = null
+            Log.d("ListarReservaViewModel", "Cargando reservas...")
+            try {
+                val response = apiService.listarMisReservas()
+                Log.d("ListarReservaViewModel", "Respuesta: ${response.code()}")
                 if (response.isSuccessful && response.body() != null) {
-                    reservasLiveData.value = response.body()!!.data
-                    Log.d("ListarReservaViewModel", "Reservas recibidas: ${response.body()!!.data}")
+                    _reservas.value = response.body()!!.data ?: emptyList()
                 } else {
-                    Log.d("ListarReservaViewModel", "No se encontraron reservas o error en la respuesta.")
-                    reservasLiveData.value = null
+                    Log.d("ListarReservaViewModel", "Sin reservas o error en respuesta")
+                    _reservas.value = emptyList()
                 }
+            } catch (e: Exception) {
+                Log.e("ListarReservaViewModel", "Error en la llamada a la API: ", e)
+                _reservas.value = emptyList()
             }
-            override fun onFailure(call: Call<ReservaListResponse>, t: Throwable) {
-                Log.e("ListarReservaViewModel", "Error en la llamada a la API: ", t)
-                reservasLiveData.value = null
-            }
-        })
+        }
     }
 
-    fun subirComprobante(reservaId: Long, imagenPart: MultipartBody.Part, callback: ActualizarCallback) {
-        apiService.subirComprobante(reservaId, imagenPart).enqueue(object : Callback<ApiResponse<Any>> {
-            override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
+    fun subirComprobante(reservaId: Long, imagenPart: MultipartBody.Part) {
+        viewModelScope.launch {
+            try {
+                val response = apiService.subirComprobante(reservaId, imagenPart)
                 if (response.isSuccessful) {
-                    callback.onSuccess("Comprobante subido correctamente.")
+                    _comprobanteEvento.emit("Comprobante subido correctamente.")
                 } else {
-                    callback.onError("Error al subir el comprobante.")
+                    _error.emit("Error al subir el comprobante.")
                 }
+            } catch (e: Exception) {
+                _error.emit(e.message ?: "Error desconocido")
             }
-            override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
-                callback.onError(t.message)
-            }
-        })
+        }
     }
 }

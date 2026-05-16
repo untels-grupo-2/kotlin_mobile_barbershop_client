@@ -11,6 +11,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -18,6 +21,7 @@ import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.BarberoDisponibleAdapter
 import com.diamond.appcliente.viewmodel.HorarioBarberoInstanciaViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class VerBarberosActivity : AppCompatActivity() {
@@ -70,12 +74,16 @@ class VerBarberosActivity : AppCompatActivity() {
 
         Log.d("VerBarberosActivity", "Fecha: $fecha | TipoHorarioId: $tipoHorarioId | HorarioRangoId: $horarioRangoId | servicioID: $servicio_id")
 
-        viewModel.getBarberos().observe(this) { barberos ->
-            if (!barberos.isNullOrEmpty()) {
-                adapter = BarberoDisponibleAdapter(barberos, this)
-                recyclerView.adapter = adapter
-            } else {
-                Toast.makeText(this, "No hay barberos disponibles para esta fecha y horario", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.barberosDisponibles.collect { barberos ->
+                    if (barberos.isNotEmpty()) {
+                        adapter = BarberoDisponibleAdapter(barberos, this@VerBarberosActivity)
+                        recyclerView.adapter = adapter
+                    } else {
+                        Toast.makeText(this@VerBarberosActivity, "No hay barberos disponibles para esta fecha y horario", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
 

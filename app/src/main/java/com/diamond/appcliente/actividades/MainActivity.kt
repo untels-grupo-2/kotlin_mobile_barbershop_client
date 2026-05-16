@@ -10,9 +10,13 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -70,19 +74,26 @@ class MainActivity : AppCompatActivity() {
         btnIngresarApp.startAnimation(fadeIn)
         btnOlvideContrasena.startAnimation(fadeIn)
 
-        mainViewModel.loginStatus.observe(this) { status ->
-            when (status) {
-                "SUCCESS" -> {
-                    val intent = Intent(this, ClienteHomeActivity::class.java)
-                    intent.putExtra("nombre", mainViewModel.nombre.value)
-                    intent.putExtra("apellido", mainViewModel.apellido.value)
-                    intent.putExtra("urlUsuario", mainViewModel.url_usuario.value)
-                    startActivity(intent)
-                    finish()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.loginResult.collect { result ->
+                    when (result) {
+                        is MainViewModel.LoginResult.Success -> {
+                            val intent = Intent(this@MainActivity, ClienteHomeActivity::class.java)
+                            intent.putExtra("nombre", result.nombre)
+                            intent.putExtra("apellido", result.apellido)
+                            intent.putExtra("urlUsuario", result.urlUsuario)
+                            startActivity(intent)
+                            finish()
+                        }
+                        is MainViewModel.LoginResult.Error -> when (result.message) {
+                            "NO_USER" -> Toast.makeText(this@MainActivity, "Rol no autorizado", Toast.LENGTH_SHORT).show()
+                            "INVALID" -> Toast.makeText(this@MainActivity, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+                            else -> Toast.makeText(this@MainActivity, "Error: ${result.message}", Toast.LENGTH_SHORT).show()
+                        }
+                        is MainViewModel.LoginResult.Idle -> Unit
+                    }
                 }
-                "NO_ADMIN" -> Toast.makeText(this, "Rol no autorizado", Toast.LENGTH_SHORT).show()
-                "INVALID" -> Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
-                else -> Toast.makeText(this, "Error: $status", Toast.LENGTH_SHORT).show()
             }
         }
     }
