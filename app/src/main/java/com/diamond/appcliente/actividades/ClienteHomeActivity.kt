@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,13 +21,17 @@ import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ClienteHomeActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private var adapter: ServicioAdapter? = null
     private var listaServicios: List<ServicioDto> = emptyList()
-    private lateinit var viewModel1: GestionarServicioViewModel
+    private val viewModel1: GestionarServicioViewModel by viewModels()
+    private val listarReservaViewModel: ListarReservaViewModel by viewModels()
+    private val usuarioViewModel: UsuarioViewModel by viewModels()
 
     private lateinit var clienteNombre: TextView
     private lateinit var clienteFoto: ImageView
@@ -49,7 +54,6 @@ class ClienteHomeActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerViewServicios)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
-        viewModel1 = GestionarServicioViewModel()
         cargarServicios()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -67,7 +71,7 @@ class ClienteHomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        ListarReservaViewModel(application).getReservas().observe(this) { reservas ->
+        listarReservaViewModel.getReservas().observe(this) { reservas ->
             if (reservas != null) {
                 var count = reservas.count { it.estRecompensa == 0 }
                 if (count > 7) count = 7
@@ -77,7 +81,7 @@ class ClienteHomeActivity : AppCompatActivity() {
     }
 
     private fun cargarDatosUsuario() {
-        UsuarioViewModel().obtenerMiUsuario(applicationContext, object : UsuarioViewModel.UsuarioCallback {
+        usuarioViewModel.obtenerMiUsuario(object : UsuarioViewModel.UsuarioCallback {
             override fun onSuccess(usuario: com.diamond.appcliente.dto.usuario.UsuarioDto?) {
                 usuario ?: return
                 nombreCliente = usuario.nombre
@@ -95,7 +99,7 @@ class ClienteHomeActivity : AppCompatActivity() {
     }
 
     private fun cargarServicios() {
-        viewModel1.obtenerServicios(this, object : GestionarServicioViewModel.ServicioCallback {
+        viewModel1.obtenerServicios(object : GestionarServicioViewModel.ServicioCallback {
             override fun onSuccess(servicios: List<ServicioDto>?) {
                 servicios ?: return
                 listaServicios = servicios

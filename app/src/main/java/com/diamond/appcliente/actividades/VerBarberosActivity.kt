@@ -9,47 +9,44 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.BarberoDisponibleAdapter
 import com.diamond.appcliente.viewmodel.HorarioBarberoInstanciaViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class VerBarberosActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private var adapter: BarberoDisponibleAdapter? = null
-    private lateinit var viewModel: HorarioBarberoInstanciaViewModel
+    private val viewModel: HorarioBarberoInstanciaViewModel by viewModels()
 
     private var nombreServicio: String? = null
     private var descripcionServicio: String? = null
     private var imagenUrlServicio: String? = null
-    private var nombreCliente: String? = null
-    private var apellidoCliente: String? = null
-    private var nombreBarberoSeleccionado: String? = null
     private var precioServicio: Double = 0.0
     private var servicio_id: Int = -1
+    private var nombreBarberoSeleccionado: String? = null
+    private var tipoHorario: String? = null
 
     private var fecha: String? = null
     private var tipoHorarioId: Long = -1L
     private var horarioRangoId: Long = -1L
-    private var tipoHorario: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ver_barberos)
 
-        val intent = intent
         recyclerView = findViewById(R.id.recyclerViewBarberos)
         nombreServicio = intent.getStringExtra("nombreServicio")
         descripcionServicio = intent.getStringExtra("descripcionServicio")
         precioServicio = intent.getDoubleExtra("precioServicio", 0.0)
         imagenUrlServicio = intent.getStringExtra("imagenServicio")
-        nombreCliente = intent.getStringExtra("nombreCliente")
-        apellidoCliente = intent.getStringExtra("apellidoCliente")
         servicio_id = intent.getIntExtra("servicio_id", -1)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -64,19 +61,14 @@ class VerBarberosActivity : AppCompatActivity() {
             window.statusBarColor = Color.BLACK
         }
 
-        viewModel = ViewModelProvider(this).get(HorarioBarberoInstanciaViewModel::class.java)
-
-        fecha = getIntent().getStringExtra("fechaReserva")
-        tipoHorario = getIntent().getStringExtra("tipoHorario")
-        horarioRangoId = getIntent().getIntExtra("horarioRangoId", -1).toLong()
+        fecha = intent.getStringExtra("fechaReserva")
+        tipoHorario = intent.getStringExtra("tipoHorario")
+        horarioRangoId = intent.getIntExtra("horarioRangoId", -1).toLong()
         Log.d("VerBarberosActivity", "horarioRangoId recibido: $horarioRangoId")
 
         tipoHorarioId = obtenerTipoHorarioValor(tipoHorario)
 
-        Log.d("VerBarberosActivity", "Fecha: $fecha")
-        Log.d("VerBarberosActivity", "TipoHorarioId: $tipoHorarioId")
-        Log.d("VerBarberosActivity", "HorarioRangoId: $horarioRangoId")
-        Log.d("VerBarberosActivity", "servicioID: $servicio_id")
+        Log.d("VerBarberosActivity", "Fecha: $fecha | TipoHorarioId: $tipoHorarioId | HorarioRangoId: $horarioRangoId | servicioID: $servicio_id")
 
         viewModel.getBarberos().observe(this) { barberos ->
             if (!barberos.isNullOrEmpty()) {
@@ -92,20 +84,12 @@ class VerBarberosActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnReservar).setOnClickListener {
             val barberoSeleccionado = adapter?.getBarberoSeleccionado()
             if (barberoSeleccionado != null) {
-                val barberoId = barberoSeleccionado.barberoId
                 nombreBarberoSeleccionado = barberoSeleccionado.nombre
-
-                Log.d("VerBarberosActivity", "Barbero ID: $barberoId")
-                Log.d("VerBarberosActivity", "Nombre Barbero: $nombreBarberoSeleccionado")
-                Log.d("VerBarberosActivity", "Horario: $tipoHorario")
-                Log.d("VerBarberosActivity", "Servicio: $nombreServicio")
-                Log.d("VerBarberosActivity", "Fecha Reserva: $fecha")
-                Log.d("VerBarberosActivity", "servicio_id: $servicio_id")
-                Log.d("VerBarberosActivity", "horarioRangoId antes de enviar: $horarioRangoId")
+                Log.d("VerBarberosActivity", "Barbero ID: ${barberoSeleccionado.barberoId} | Nombre: $nombreBarberoSeleccionado")
 
                 val intentReserva = Intent(this, ReservaActivity::class.java)
                 intentReserva.putExtra("barbero", nombreBarberoSeleccionado)
-                intentReserva.putExtra("barberoId", barberoId)
+                intentReserva.putExtra("barberoId", barberoSeleccionado.barberoId)
                 intentReserva.putExtra("horario", tipoHorario)
                 intentReserva.putExtra("servicio", nombreServicio)
                 intentReserva.putExtra("servicio_id", servicio_id)

@@ -1,22 +1,24 @@
 package com.diamond.appcliente.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.diamond.appcliente.api.ApiClient
+import androidx.lifecycle.ViewModel
 import com.diamond.appcliente.api.AuthApiService
+import com.diamond.appcliente.di.UnauthenticatedApi
 import com.diamond.appcliente.dto.recuperacion.RecuperacionRequest
 import com.diamond.appcliente.dto.recuperacion.RecuperacionResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class RecuperarContraViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class RecuperarContraViewModel @Inject constructor(
+    @UnauthenticatedApi private val authApiService: AuthApiService
+) : ViewModel() {
 
     val resultado = MutableLiveData<String>()
     val error = MutableLiveData<String>()
-
-    private val authApiService = ApiClient.getRetrofit(application, false).create(AuthApiService::class.java)
 
     fun recuperar(usuario: String, correo: String) {
         authApiService.recuperarContraseña(RecuperacionRequest(usuario, correo))
@@ -38,7 +40,6 @@ class RecuperarContraViewModel(application: Application) : AndroidViewModel(appl
                         error.postValue("Error HTTP ${response.code()}: $rawError")
                     }
                 }
-
                 override fun onFailure(call: Call<RecuperacionResponse>, t: Throwable) {
                     error.postValue("Error de conexión: ${t.message}")
                 }

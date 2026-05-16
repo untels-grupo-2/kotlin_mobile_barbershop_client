@@ -1,14 +1,14 @@
 package com.diamond.appcliente.api
 
-import android.content.Context
 import com.diamond.appcliente.util.PreferenciasHelper
 import okhttp3.Interceptor
 import okhttp3.Response
+import javax.inject.Inject
 
-class AuthInterceptor(context: Context) : Interceptor {
-
-    private val preferenciasHelper = PreferenciasHelper(context)
-    private val appContext = context
+class AuthInterceptor @Inject constructor(
+    private val preferenciasHelper: PreferenciasHelper,
+    private val tokenManager: TokenManager
+) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val token = preferenciasHelper.obtenerToken()
@@ -26,10 +26,7 @@ class AuthInterceptor(context: Context) : Interceptor {
 
         if (response.code == 401) {
             response.close()
-
-            val tokenManager = TokenManager(appContext)
             val newToken = tokenManager.refreshToken()
-
             if (newToken != null) {
                 val newRequest = originalRequest.newBuilder()
                     .header("Authorization", "Bearer $newToken")

@@ -1,28 +1,32 @@
 package com.diamond.appcliente.viewmodel
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.diamond.appcliente.api.ApiClient
+import androidx.lifecycle.ViewModel
 import com.diamond.appcliente.api.AuthApiService
+import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.barbero.BarberoListResponse
 import com.diamond.appcliente.dto.barbero.DtoBarberoDisponible
 import com.diamond.appcliente.util.PreferenciasHelper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class HorarioBarberoInstanciaViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class HorarioBarberoInstanciaViewModel @Inject constructor(
+    @AuthenticatedApi private val apiService: AuthApiService,
+    private val preferenciasHelper: PreferenciasHelper
+) : ViewModel() {
 
     private val barberosDisponibles = MutableLiveData<List<DtoBarberoDisponible>?>()
-    private val apiService = ApiClient.getRetrofit(application, true).create(AuthApiService::class.java)
 
     fun getBarberos(): LiveData<List<DtoBarberoDisponible>?> = barberosDisponibles
 
     fun obtenerBarberosDisponibles(fecha: String, tipoHorarioId: Long, horarioRangoId: Long) {
-        val token = PreferenciasHelper(getApplication()).obtenerToken()
+        val token = preferenciasHelper.obtenerToken()
         if (token.isNullOrEmpty()) {
             Log.e("HorarioBarberoInstanciaViewModel", "Token no encontrado o es inválido")
             return
@@ -45,7 +49,6 @@ class HorarioBarberoInstanciaViewModel(application: Application) : AndroidViewMo
                         }
                     }
                 }
-
                 override fun onFailure(call: Call<BarberoListResponse>, t: Throwable) {
                     Log.e("HorarioBarberoInstanciaViewModel", "Error de conexión: ${t.message}")
                     barberosDisponibles.value = null

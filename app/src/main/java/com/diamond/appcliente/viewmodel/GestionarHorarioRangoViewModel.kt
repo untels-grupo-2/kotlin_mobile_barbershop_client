@@ -1,25 +1,29 @@
 package com.diamond.appcliente.viewmodel
 
-import android.content.Context
 import android.util.Log
-import com.diamond.appcliente.api.ApiClient
+import androidx.lifecycle.ViewModel
 import com.diamond.appcliente.api.AuthApiService
+import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.horariorango.HorarioRangoDto
 import com.diamond.appcliente.dto.horariorango.HorarioRangoResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class GestionarHorarioRangoViewModel {
+@HiltViewModel
+class GestionarHorarioRangoViewModel @Inject constructor(
+    @AuthenticatedApi private val authApiService: AuthApiService
+) : ViewModel() {
 
     interface HorarioRangoCallback {
         fun onSuccess(horarioRangos: List<HorarioRangoDto>?)
         fun onError(mensaje: String?)
     }
 
-    fun obtenerHorariosRangos(context: Context, tipoHorarioId: Int, callback: HorarioRangoCallback) {
-        val api = ApiClient.getRetrofit(context, true).create(AuthApiService::class.java)
-        api.obtenerHorariosRangos(tipoHorarioId).enqueue(object : Callback<HorarioRangoResponse> {
+    fun obtenerHorariosRangos(tipoHorarioId: Int, callback: HorarioRangoCallback) {
+        authApiService.obtenerHorariosRangos(tipoHorarioId).enqueue(object : Callback<HorarioRangoResponse> {
             override fun onResponse(call: Call<HorarioRangoResponse>, response: Response<HorarioRangoResponse>) {
                 Log.d("API_Response", "Estado de la respuesta: ${response.code()}")
                 if (response.isSuccessful && response.body() != null) {
@@ -36,7 +40,6 @@ class GestionarHorarioRangoViewModel {
                     callback.onError("Error al obtener los horarios")
                 }
             }
-
             override fun onFailure(call: Call<HorarioRangoResponse>, t: Throwable) {
                 Log.e("API_Failure", "Fallo en la conexión: ${t.message}")
                 callback.onError(t.message)

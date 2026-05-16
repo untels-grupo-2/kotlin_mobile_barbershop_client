@@ -1,28 +1,30 @@
 package com.diamond.appcliente.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.auth0.android.jwt.JWT
-import com.diamond.appcliente.api.ApiClient
 import com.diamond.appcliente.api.AuthApiService
+import com.diamond.appcliente.di.UnauthenticatedApi
 import com.diamond.appcliente.dto.login.LoginRequest
 import com.diamond.appcliente.dto.login.LoginResponse
 import com.diamond.appcliente.util.PreferenciasHelper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    @UnauthenticatedApi private val authApiService: AuthApiService,
+    private val preferenciasHelper: PreferenciasHelper
+) : ViewModel() {
 
     val apellido = MutableLiveData<String>()
     val loginStatus = MutableLiveData<String>()
     val nombre = MutableLiveData<String>()
     val url_usuario = MutableLiveData<String>()
     val usuario_id = MutableLiveData<String>()
-
-    private val authApiService: AuthApiService =
-        ApiClient.getRetrofit(application, false).create(AuthApiService::class.java)
 
     fun login(usuario: String, password: String) {
         authApiService.login(LoginRequest(usuario, password)).enqueue(object : Callback<LoginResponse> {
@@ -38,10 +40,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         return
                     }
 
-                    PreferenciasHelper(getApplication()).apply {
-                        guardarToken(token)
-                        guardarRefreshToken(refreshToken)
-                    }
+                    preferenciasHelper.guardarToken(token)
+                    preferenciasHelper.guardarRefreshToken(refreshToken)
 
                     nombre.postValue(jwt.getClaim("nombre").asString())
                     apellido.postValue(jwt.getClaim("apellido").asString())

@@ -10,24 +10,26 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
 import java.io.IOException
 
+@AndroidEntryPoint
 class SubirComprobanteActivity : AppCompatActivity() {
 
     private lateinit var imagePreview: ImageView
     private var imagenSeleccionadaUri: Uri? = null
-    private lateinit var listarReservaViewModel: ListarReservaViewModel
+    private val listarReservaViewModel: ListarReservaViewModel by viewModels()
     private var reservaId: Long = -1L
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,8 +37,6 @@ class SubirComprobanteActivity : AppCompatActivity() {
         setContentView(R.layout.activity_subir_comprobante)
 
         reservaId = intent.getLongExtra("reservaId", -1L)
-        listarReservaViewModel = ViewModelProvider(this).get(ListarReservaViewModel::class.java)
-
         imagePreview = findViewById(R.id.imagePreview)
 
         if (ContextCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") != 0) {

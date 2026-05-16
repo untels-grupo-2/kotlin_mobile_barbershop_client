@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,13 +18,18 @@ import com.diamond.appcliente.dto.servicio.ServicioDto
 import com.diamond.appcliente.util.PreferenciasHelper
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SeccionServiciosActivity : AppCompatActivity() {
+
+    @Inject lateinit var preferenciasHelper: PreferenciasHelper
 
     private lateinit var recyclerView: RecyclerView
     private var adapter: ServicioAdapter? = null
     private var listaServicios: List<ServicioDto> = emptyList()
-    private lateinit var viewModel1: GestionarServicioViewModel
+    private val viewModel1: GestionarServicioViewModel by viewModels()
 
     private var nombreCliente: String? = null
     private var apellidoCliente: String? = null
@@ -33,7 +39,7 @@ class SeccionServiciosActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_area_servicios)
 
-        val token = PreferenciasHelper(application).obtenerToken()
+        val token = preferenciasHelper.obtenerToken()
         val jwt = JWT(token!!)
         nombreCliente = jwt.getClaim("nombre").asString()
         apellidoCliente = jwt.getClaim("apellido").asString()
@@ -42,7 +48,6 @@ class SeccionServiciosActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerViewServicios)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
-        viewModel1 = GestionarServicioViewModel()
         cargarServicios()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -57,14 +62,13 @@ class SeccionServiciosActivity : AppCompatActivity() {
     }
 
     private fun cargarServicios() {
-        viewModel1.obtenerServicios(this, object : GestionarServicioViewModel.ServicioCallback {
+        viewModel1.obtenerServicios(object : GestionarServicioViewModel.ServicioCallback {
             override fun onSuccess(servicios: List<ServicioDto>?) {
                 servicios ?: return
                 listaServicios = servicios
                 adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
                     override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
-                        Log.d("IntentData", "nombreServicio: ${servicio.nombre}")
-                        Log.d("IntentData", "servicio_id: ${servicio.servicio_id}")
+                        Log.d("IntentData", "nombreServicio: ${servicio.nombre} | servicio_id: ${servicio.servicio_id}")
                         val intent = Intent(this@SeccionServiciosActivity, ListarRangoHorarios::class.java)
                         intent.putExtra("nombreServicio", servicio.nombre)
                         intent.putExtra("servicio_id", servicio.servicio_id)

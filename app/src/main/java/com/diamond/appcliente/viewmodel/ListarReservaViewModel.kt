@@ -1,21 +1,25 @@
 package com.diamond.appcliente.viewmodel
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.diamond.appcliente.api.ApiClient
+import androidx.lifecycle.ViewModel
 import com.diamond.appcliente.api.AuthApiService
+import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.common.ApiResponse
 import com.diamond.appcliente.dto.reserva.ReservaListResponse
 import com.diamond.appcliente.dto.reserva.ReservaResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class ListarReservaViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ListarReservaViewModel @Inject constructor(
+    @AuthenticatedApi private val apiService: AuthApiService
+) : ViewModel() {
 
     interface ActualizarCallback {
         fun onSuccess(str: String)
@@ -23,7 +27,6 @@ class ListarReservaViewModel(application: Application) : AndroidViewModel(applic
     }
 
     val reservasLiveData = MutableLiveData<List<ReservaResponse>?>()
-    private val apiService = ApiClient.getRetrofit(application.applicationContext, true).create(AuthApiService::class.java)
 
     fun getReservas(): LiveData<List<ReservaResponse>?> {
         loadReservations()
@@ -43,7 +46,6 @@ class ListarReservaViewModel(application: Application) : AndroidViewModel(applic
                     reservasLiveData.value = null
                 }
             }
-
             override fun onFailure(call: Call<ReservaListResponse>, t: Throwable) {
                 Log.e("ListarReservaViewModel", "Error en la llamada a la API: ", t)
                 reservasLiveData.value = null
@@ -60,7 +62,6 @@ class ListarReservaViewModel(application: Application) : AndroidViewModel(applic
                     callback.onError("Error al subir el comprobante.")
                 }
             }
-
             override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
                 callback.onError(t.message)
             }

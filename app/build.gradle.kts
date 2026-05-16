@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -81,4 +82,6 @@ dependencies {
     kapt("com.github.bumptech.glide:compiler:4.12.0")
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.4")
     implementation ("androidx.recyclerview:recyclerview:1.2.1")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 }

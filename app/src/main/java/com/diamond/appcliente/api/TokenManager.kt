@@ -1,13 +1,14 @@
 package com.diamond.appcliente.api
 
-import android.content.Context
+import com.diamond.appcliente.di.UnauthenticatedApi
 import com.diamond.appcliente.dto.refresh.RefreshRequest
 import com.diamond.appcliente.util.PreferenciasHelper
+import javax.inject.Inject
 
-class TokenManager(context: Context) {
-
-    private val prefs = PreferenciasHelper(context)
-    private val authApi = ApiClient.getRetrofit(context, false).create(AuthApiService::class.java)
+class TokenManager @Inject constructor(
+    private val prefs: PreferenciasHelper,
+    @UnauthenticatedApi private val authApi: AuthApiService
+) {
 
     @Synchronized
     fun refreshToken(): String? {

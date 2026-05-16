@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,10 +17,12 @@ import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.BarberoAdapter
 import com.diamond.appcliente.dto.barbero.BarberoDto
 import com.diamond.appcliente.viewmodel.GestionarBarberoViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class GestionarBarberoActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: GestionarBarberoViewModel
+    private val viewModel: GestionarBarberoViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
     private var adapter: BarberoAdapter? = null
 
@@ -53,8 +56,7 @@ class GestionarBarberoActivity : AppCompatActivity() {
         tipoHorarioValor = obtenerTipoHorarioValor(tipoHorario)
         turnoReservaValor = obtenerTurnoReservaValor(turnoReserva)
 
-        Log.d("GestionarBarberoActivity", "Tipo Horario Valor: $tipoHorarioValor")
-        Log.d("GestionarBarberoActivity", "Turno Reserva Valor: $turnoReservaValor")
+        Log.d("GestionarBarberoActivity", "Tipo Horario Valor: $tipoHorarioValor | Turno Reserva Valor: $turnoReservaValor")
 
         Glide.with(this).load(imagenUrlServicio).into(findViewById<ImageView>(R.id.imagenServicio))
 
@@ -68,12 +70,11 @@ class GestionarBarberoActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnReservar).setOnClickListener { mostrarPopupConfirmacion() }
 
-        viewModel = GestionarBarberoViewModel()
         cargarLista()
     }
 
     private fun cargarLista() {
-        viewModel.obtenerBarberos(this, object : GestionarBarberoViewModel.BarberoCallback {
+        viewModel.obtenerBarberos(object : GestionarBarberoViewModel.BarberoCallback {
             override fun onSuccess(barberos: List<BarberoDto>?) {
                 barberos ?: return
                 adapter = BarberoAdapter(barberos, object : BarberoAdapter.OnBarberoClickListener {
@@ -115,26 +116,13 @@ class GestionarBarberoActivity : AppCompatActivity() {
     }
 
     private fun obtenerTipoHorarioValor(tipoHorario: String?): Int = when (tipoHorario) {
-        "MAÑANA" -> 1
-        "TARDE" -> 2
-        "NOCHE" -> 3
-        else -> -1
+        "MAÑANA" -> 1; "TARDE" -> 2; "NOCHE" -> 3; else -> -1
     }
 
     private fun obtenerTurnoReservaValor(boton: String?): Int = when (boton) {
-        "9 AM - 10 AM" -> 1
-        "10 AM - 11 AM" -> 2
-        "11 AM - 12 PM" -> 3
-        "12 PM - 1 PM" -> 4
-        "1 PM - 2 PM" -> 5
-        "2 PM - 3 PM" -> 6
-        "3 PM - 4 PM" -> 7
-        "4 PM - 5 PM" -> 8
-        "5 PM - 6 PM" -> 9
-        "6 PM - 7 PM" -> 10
-        "7 PM - 8 PM" -> 11
-        "8 PM - 9 PM" -> 12
-        "9 PM - 10 PM" -> 13
-        else -> -1
+        "9 AM - 10 AM" -> 1; "10 AM - 11 AM" -> 2; "11 AM - 12 PM" -> 3; "12 PM - 1 PM" -> 4
+        "1 PM - 2 PM" -> 5; "2 PM - 3 PM" -> 6; "3 PM - 4 PM" -> 7; "4 PM - 5 PM" -> 8
+        "5 PM - 6 PM" -> 9; "6 PM - 7 PM" -> 10; "7 PM - 8 PM" -> 11; "8 PM - 9 PM" -> 12
+        "9 PM - 10 PM" -> 13; else -> -1
     }
 }

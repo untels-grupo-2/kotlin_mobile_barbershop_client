@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.auth0.android.jwt.JWT
 import com.bumptech.glide.Glide
@@ -21,7 +22,10 @@ import com.diamond.appcliente.dto.usuario.UsuarioDto
 import com.diamond.appcliente.util.PreferenciasHelper
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class UsuarioActivity : AppCompatActivity() {
 
     private lateinit var btnLogoutUser: Button
@@ -29,8 +33,10 @@ class UsuarioActivity : AppCompatActivity() {
     private lateinit var textCelular: TextView
     private lateinit var textEmail: TextView
     private lateinit var textNombre: TextView
-    private lateinit var viewModel: UsuarioViewModel
+    private val viewModel: UsuarioViewModel by viewModels()
     private var imagenSeleccionadaUri: Uri? = null
+
+    @Inject lateinit var preferenciasHelper: PreferenciasHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,13 +47,12 @@ class UsuarioActivity : AppCompatActivity() {
         textEmail = findViewById(R.id.textEmail)
         textCelular = findViewById(R.id.textCelular)
         btnLogoutUser = findViewById(R.id.btnLogoutUser)
-        viewModel = UsuarioViewModel()
 
-        val token = PreferenciasHelper(application).obtenerToken()
+        val token = preferenciasHelper.obtenerToken()
         if (token != null) {
             Log.d("UsuarioActivity", "Token recibido: $token")
             JWT(token)
-            viewModel.obtenerMiUsuario(this, object : UsuarioViewModel.UsuarioCallback {
+            viewModel.obtenerMiUsuario(object : UsuarioViewModel.UsuarioCallback {
                 override fun onSuccess(usuario: UsuarioDto?) {
                     usuario ?: return
                     textNombre.text = "${usuario.nombre} ${usuario.apellido}"
@@ -91,8 +96,8 @@ class UsuarioActivity : AppCompatActivity() {
         val editTextEmail = popupView.findViewById<EditText>(R.id.etEmailUsuario)
         val editTextCelular = popupView.findViewById<EditText>(R.id.etCelularUsuario)
 
-        if (PreferenciasHelper(application).obtenerToken() != null) {
-            viewModel.obtenerMiUsuario(this, object : UsuarioViewModel.UsuarioCallback {
+        if (preferenciasHelper.obtenerToken() != null) {
+            viewModel.obtenerMiUsuario(object : UsuarioViewModel.UsuarioCallback {
                 override fun onSuccess(usuario: UsuarioDto?) {
                     usuario ?: return
                     editTextNombre.setText(usuario.nombre)
@@ -153,8 +158,8 @@ class UsuarioActivity : AppCompatActivity() {
     }
 
     private fun actualizarUsuario(dtoUsuario: UsuarioDto) {
-        if (PreferenciasHelper(application).obtenerToken() == null) return
-        viewModel.actualizarMiPerfil(this, dtoUsuario, null, object : UsuarioViewModel.ActualizarCallback {
+        if (preferenciasHelper.obtenerToken() == null) return
+        viewModel.actualizarMiPerfil(dtoUsuario, null, object : UsuarioViewModel.ActualizarCallback {
             override fun onSuccess(str: String) {
                 Toast.makeText(this@UsuarioActivity, str, Toast.LENGTH_SHORT).show()
                 cargarUsuario()
@@ -166,8 +171,8 @@ class UsuarioActivity : AppCompatActivity() {
     }
 
     private fun actualizarUsuarioConImagen(dtoUsuario: UsuarioDto, imagenUri: Uri) {
-        if (PreferenciasHelper(application).obtenerToken() == null) return
-        viewModel.actualizarMiPerfil(this, dtoUsuario, imagenUri, object : UsuarioViewModel.ActualizarCallback {
+        if (preferenciasHelper.obtenerToken() == null) return
+        viewModel.actualizarMiPerfil(dtoUsuario, imagenUri, object : UsuarioViewModel.ActualizarCallback {
             override fun onSuccess(str: String) {
                 Toast.makeText(this@UsuarioActivity, str, Toast.LENGTH_SHORT).show()
                 cargarUsuario()
@@ -179,7 +184,7 @@ class UsuarioActivity : AppCompatActivity() {
     }
 
     private fun cerrarSesion() {
-        PreferenciasHelper(application).limpiarPreferencias()
+        preferenciasHelper.limpiarPreferencias()
         Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -188,8 +193,8 @@ class UsuarioActivity : AppCompatActivity() {
     }
 
     private fun cargarUsuario() {
-        if (PreferenciasHelper(application).obtenerToken() == null) return
-        viewModel.obtenerMiUsuario(this, object : UsuarioViewModel.UsuarioCallback {
+        if (preferenciasHelper.obtenerToken() == null) return
+        viewModel.obtenerMiUsuario(object : UsuarioViewModel.UsuarioCallback {
             override fun onSuccess(usuario: UsuarioDto?) {
                 usuario ?: return
                 textNombre.text = "${usuario.nombre} ${usuario.apellido}"
