@@ -1,20 +1,24 @@
 package com.diamond.appcliente.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.diamond.appcliente.api.ApiClient
 import com.diamond.appcliente.api.AuthApiService
+import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.servicio.ServicioDto
 import com.diamond.appcliente.dto.servicio.ServicioRequest
 import com.diamond.appcliente.dto.servicio.ServicioResponse
 import com.diamond.appcliente.dto.servicio.ServicioSimpleResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class GestionarServicioViewModel : ViewModel() {
+@HiltViewModel
+class GestionarServicioViewModel @Inject constructor(
+    @AuthenticatedApi private val authApiService: AuthApiService
+) : ViewModel() {
 
     interface ServicioCallback {
         fun onSuccess(servicios: List<ServicioDto>?)
@@ -37,9 +41,8 @@ class GestionarServicioViewModel : ViewModel() {
     fun getListaServicios(): LiveData<List<ServicioDto>> = listaServiciosLiveData
     fun getServicioOperacionStatus(): LiveData<String> = servicioOperacionStatus
 
-    fun obtenerServicios(context: Context, callback: ServicioCallback) {
-        val api = ApiClient.getRetrofit(context, true).create(AuthApiService::class.java)
-        api.listarServicios().enqueue(object : Callback<ServicioResponse> {
+    fun obtenerServicios(callback: ServicioCallback) {
+        authApiService.listarServicios().enqueue(object : Callback<ServicioResponse> {
             override fun onResponse(call: Call<ServicioResponse>, response: Response<ServicioResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     listaServiciosLiveData.value = response.body()!!.data
@@ -49,7 +52,6 @@ class GestionarServicioViewModel : ViewModel() {
                     callback.onError("Error al obtener servicios")
                 }
             }
-
             override fun onFailure(call: Call<ServicioResponse>, t: Throwable) {
                 servicioOperacionStatus.value = "Error: ${t.message}"
                 callback.onError(t.message)
@@ -57,13 +59,12 @@ class GestionarServicioViewModel : ViewModel() {
         })
     }
 
-    fun crearServicio(context: Context, request: ServicioRequest, callback: ServicioOperacionCallback) {
-        val api = ApiClient.getRetrofit(context, true).create(AuthApiService::class.java)
-        api.crearServicio(request).enqueue(object : Callback<ServicioResponse> {
+    fun crearServicio(request: ServicioRequest, callback: ServicioOperacionCallback) {
+        authApiService.crearServicio(request).enqueue(object : Callback<ServicioResponse> {
             override fun onResponse(call: Call<ServicioResponse>, response: Response<ServicioResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     servicioOperacionStatus.value = "Servicio creado con éxito"
-                    obtenerServicios(context, object : ServicioCallback {
+                    obtenerServicios(object : ServicioCallback {
                         override fun onSuccess(servicios: List<ServicioDto>?) { listaServiciosLiveData.value = servicios }
                         override fun onError(mensaje: String?) { servicioOperacionStatus.value = mensaje }
                     })
@@ -73,7 +74,6 @@ class GestionarServicioViewModel : ViewModel() {
                     callback.onError("Error al crear servicio")
                 }
             }
-
             override fun onFailure(call: Call<ServicioResponse>, t: Throwable) {
                 servicioOperacionStatus.value = "Error: ${t.message}"
                 callback.onError(t.message)
@@ -81,13 +81,12 @@ class GestionarServicioViewModel : ViewModel() {
         })
     }
 
-    fun actualizarServicio(context: Context, id: Int, request: ServicioRequest, callback: ActualizarCallback) {
-        val api = ApiClient.getRetrofit(context, true).create(AuthApiService::class.java)
-        api.actualizarServicio(id, request).enqueue(object : Callback<ServicioSimpleResponse> {
+    fun actualizarServicio(id: Int, request: ServicioRequest, callback: ActualizarCallback) {
+        authApiService.actualizarServicio(id, request).enqueue(object : Callback<ServicioSimpleResponse> {
             override fun onResponse(call: Call<ServicioSimpleResponse>, response: Response<ServicioSimpleResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     servicioOperacionStatus.value = "Servicio actualizado con éxito"
-                    obtenerServicios(context, object : ServicioCallback {
+                    obtenerServicios(object : ServicioCallback {
                         override fun onSuccess(servicios: List<ServicioDto>?) { listaServiciosLiveData.value = servicios }
                         override fun onError(mensaje: String?) { servicioOperacionStatus.value = mensaje }
                     })
@@ -97,7 +96,6 @@ class GestionarServicioViewModel : ViewModel() {
                     callback.onError("Error al actualizar servicio")
                 }
             }
-
             override fun onFailure(call: Call<ServicioSimpleResponse>, t: Throwable) {
                 servicioOperacionStatus.value = "Error: ${t.message}"
                 callback.onError(t.message)
@@ -105,13 +103,12 @@ class GestionarServicioViewModel : ViewModel() {
         })
     }
 
-    fun eliminarServicio(context: Context, id: Int, callback: ServicioOperacionCallback) {
-        val api = ApiClient.getRetrofit(context, true).create(AuthApiService::class.java)
-        api.eliminarServicio(id).enqueue(object : Callback<ServicioResponse> {
+    fun eliminarServicio(id: Int, callback: ServicioOperacionCallback) {
+        authApiService.eliminarServicio(id).enqueue(object : Callback<ServicioResponse> {
             override fun onResponse(call: Call<ServicioResponse>, response: Response<ServicioResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     servicioOperacionStatus.value = "Servicio eliminado con éxito"
-                    obtenerServicios(context, object : ServicioCallback {
+                    obtenerServicios(object : ServicioCallback {
                         override fun onSuccess(servicios: List<ServicioDto>?) { listaServiciosLiveData.value = servicios }
                         override fun onError(mensaje: String?) { servicioOperacionStatus.value = mensaje }
                     })
@@ -121,7 +118,6 @@ class GestionarServicioViewModel : ViewModel() {
                     callback.onError("Error al eliminar servicio")
                 }
             }
-
             override fun onFailure(call: Call<ServicioResponse>, t: Throwable) {
                 servicioOperacionStatus.value = "Error: ${t.message}"
                 callback.onError(t.message)

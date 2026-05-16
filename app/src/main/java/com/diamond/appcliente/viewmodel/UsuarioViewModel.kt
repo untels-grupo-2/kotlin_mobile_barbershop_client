@@ -3,12 +3,15 @@ package com.diamond.appcliente.viewmodel
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.diamond.appcliente.api.ApiClient
+import androidx.lifecycle.ViewModel
 import com.diamond.appcliente.api.AuthApiService
+import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.common.ApiResponse
 import com.diamond.appcliente.dto.usuario.UsuarioDto
 import com.diamond.appcliente.dto.usuario.UsuarioResponse
 import com.google.gson.Gson
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -17,8 +20,13 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
+import javax.inject.Inject
 
-class UsuarioViewModel {
+@HiltViewModel
+class UsuarioViewModel @Inject constructor(
+    @AuthenticatedApi private val authApiService: AuthApiService,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
     interface ActualizarCallback {
         fun onSuccess(str: String)
@@ -30,29 +38,26 @@ class UsuarioViewModel {
         fun onError(str: String?)
     }
 
-    fun obtenerMiUsuario(context: Context, callback: UsuarioCallback) {
-        ApiClient.getRetrofit(context, true).create(AuthApiService::class.java)
-            .obtenerMiUsuario().enqueue(object : Callback<UsuarioResponse> {
-                override fun onResponse(call: Call<UsuarioResponse>, response: Response<UsuarioResponse>) {
-                    if (response.isSuccessful && response.body() != null) {
-                        callback.onSuccess(response.body()!!.data)
-                    } else {
-                        callback.onError("Error al obtener usuario")
-                    }
+    fun obtenerMiUsuario(callback: UsuarioCallback) {
+        authApiService.obtenerMiUsuario().enqueue(object : Callback<UsuarioResponse> {
+            override fun onResponse(call: Call<UsuarioResponse>, response: Response<UsuarioResponse>) {
+                if (response.isSuccessful && response.body() != null) {
+                    callback.onSuccess(response.body()!!.data)
+                } else {
+                    callback.onError("Error al obtener usuario")
                 }
-
-                override fun onFailure(call: Call<UsuarioResponse>, t: Throwable) {
-                    callback.onError(t.message)
-                }
-            })
+            }
+            override fun onFailure(call: Call<UsuarioResponse>, t: Throwable) {
+                callback.onError(t.message)
+            }
+        })
     }
 
-    fun actualizarMiPerfil(context: Context, dtoUsuario: UsuarioDto, imagenUri: Uri?, callback: ActualizarCallback) {
+    fun actualizarMiPerfil(dtoUsuario: UsuarioDto, imagenUri: Uri?, callback: ActualizarCallback) {
         if (dtoUsuario.nombre.isNullOrEmpty()) { callback.onError("El campo nombre no puede estar vacío"); return }
         if (dtoUsuario.apellido.isNullOrEmpty()) { callback.onError("El campo apellido no puede estar vacío"); return }
         if (dtoUsuario.celular.isNullOrEmpty()) { callback.onError("El campo celular no puede estar vacío"); return }
 
-        val api = ApiClient.getRetrofit(context, true).create(AuthApiService::class.java)
         val requestBody = RequestBody.create(MediaType.parse("application/json"), Gson().toJson(dtoUsuario))
         Log.d("UsuarioActivity", "Datos del usuario enviados: ${Gson().toJson(dtoUsuario)}")
 
@@ -70,7 +75,7 @@ class UsuarioViewModel {
             }
         }
 
-        api.actualizarMiPerfil(requestBody, imagenPart!!).enqueue(object : Callback<ApiResponse<Any>> {
+        authApiService.actualizarMiPerfil(requestBody, imagenPart!!).enqueue(object : Callback<ApiResponse<Any>> {
             override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
                 if (response.isSuccessful) {
                     Log.d("UsuarioActivity", "Respuesta exitosa: ${response.body()}")
@@ -81,7 +86,6 @@ class UsuarioViewModel {
                     callback.onError("Error al actualizar usuario")
                 }
             }
-
             override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
                 Log.e("UsuarioActivity", "Error al actualizar usuario", t)
                 callback.onError(t.message)

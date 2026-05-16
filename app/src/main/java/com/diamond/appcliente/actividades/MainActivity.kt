@@ -8,18 +8,20 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var campoUsuario: EditText
     private lateinit var campoContraseña: EditText
     private lateinit var btnIngresarApp: Button
     private lateinit var btnOlvideContrasena: Button
-    private lateinit var mainViewModel: MainViewModel
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +31,6 @@ class MainActivity : AppCompatActivity() {
         campoContraseña = findViewById(R.id.campoContraseña)
         btnIngresarApp = findViewById(R.id.btnIngresarApp)
         btnOlvideContrasena = findViewById(R.id.btnOlvideContrasena)
-
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         val shakeAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
 
@@ -56,8 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val decorView = window.decorView
-            val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            decorView.systemUiVisibility = uiOptions
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         }
 
         btnOlvideContrasena.setOnClickListener {

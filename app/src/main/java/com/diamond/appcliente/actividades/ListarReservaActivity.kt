@@ -5,19 +5,21 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ListarReservaAdapter
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ListarReservaActivity : AppCompatActivity() {
 
     private lateinit var listarReservaAdapter: ListarReservaAdapter
-    private lateinit var listarReservaViewModel: ListarReservaViewModel
+    private val listarReservaViewModel: ListarReservaViewModel by viewModels()
     private lateinit var progressBar: ProgressBar
     private lateinit var recyclerView: RecyclerView
 
@@ -30,7 +32,6 @@ class ListarReservaActivity : AppCompatActivity() {
         listarReservaAdapter = ListarReservaAdapter()
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = listarReservaAdapter
-        listarReservaViewModel = ViewModelProvider(this).get(ListarReservaViewModel::class.java)
         loadReservations()
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)

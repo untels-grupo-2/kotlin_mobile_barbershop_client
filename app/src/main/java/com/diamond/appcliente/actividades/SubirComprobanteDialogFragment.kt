@@ -6,28 +6,28 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
 import java.io.IOException
 
+@AndroidEntryPoint
 class SubirComprobanteDialogFragment : DialogFragment() {
 
     private var imagenSeleccionadaUri: Uri? = null
-    private lateinit var listarReservaViewModel: ListarReservaViewModel
+    private val listarReservaViewModel: ListarReservaViewModel by activityViewModels()
     private var reservaId: Long = -1L
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         reservaId = requireArguments().getLong("reservaId")
-        listarReservaViewModel = ViewModelProvider(requireActivity()).get(ListarReservaViewModel::class.java)
 
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = requireActivity().layoutInflater.inflate(R.layout.activity_subir_comprobante, null)

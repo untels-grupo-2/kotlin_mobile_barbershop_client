@@ -1,16 +1,18 @@
 package com.diamond.appcliente.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.diamond.appcliente.util.PreferenciasHelper
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ClienteHomeViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ClienteHomeViewModel @Inject constructor(
+    private val preferenciasHelper: PreferenciasHelper
+) : ViewModel() {
 
     val nombreCompleto = MutableLiveData<String>()
     val imagenUrlCliente = MutableLiveData<String>()
-
-    private val preferenciasHelper = PreferenciasHelper(application)
 
     fun setNombreYApellido(nombre: String, apellido: String) {
         nombreCompleto.value = "$nombre $apellido"

@@ -7,18 +7,20 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.RecuperarContraViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RecuperarContraActivity : AppCompatActivity() {
 
     private lateinit var campoUsuario: EditText
     private lateinit var campoCorreo: EditText
     private lateinit var btnRecuperarContra: Button
     private lateinit var btnVolverLogin: Button
-    private lateinit var viewModel: RecuperarContraViewModel
+    private val viewModel: RecuperarContraViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +30,6 @@ class RecuperarContraActivity : AppCompatActivity() {
         campoCorreo = findViewById(R.id.campoEmail)
         btnRecuperarContra = findViewById(R.id.btnRecuperarContra)
         btnVolverLogin = findViewById(R.id.btnVolverLogin)
-
-        viewModel = ViewModelProvider(this).get(RecuperarContraViewModel::class.java)
 
         btnRecuperarContra.setOnClickListener {
             val usuario = campoUsuario.text.toString().trim()
