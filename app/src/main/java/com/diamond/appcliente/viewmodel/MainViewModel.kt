@@ -1,5 +1,6 @@
 package com.diamond.appcliente.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.auth0.android.jwt.JWT
@@ -22,6 +23,7 @@ class MainViewModel @Inject constructor(
 
     sealed class LoginResult {
         object Idle : LoginResult()
+        object Loading : LoginResult()
         data class Success(val nombre: String, val apellido: String, val urlUsuario: String) : LoginResult()
         data class Error(val message: String) : LoginResult()
     }
@@ -31,8 +33,11 @@ class MainViewModel @Inject constructor(
 
     fun login(usuario: String, password: String) {
         viewModelScope.launch {
+            _loginResult.value = LoginResult.Loading
+            Log.d("MainViewModel", "Iniciando login para: $usuario | URL: ${authApiService}")
             try {
                 val response = authApiService.login(LoginRequest(usuario, password))
+                Log.d("MainViewModel", "Respuesta recibida: HTTP ${response.code()}")
                 if (response.isSuccessful && response.body() != null) {
                     val body = response.body()!!
                     val token = body.data?.token ?: run { _loginResult.value = LoginResult.Error("Token nulo"); return@launch }
@@ -57,6 +62,7 @@ class MainViewModel @Inject constructor(
                     _loginResult.value = LoginResult.Error("ERROR_${response.code()}")
                 }
             } catch (e: Exception) {
+                Log.e("MainViewModel", "Error de conexión: ${e.javaClass.simpleName} - ${e.message}")
                 _loginResult.value = LoginResult.Error("FAILURE: ${e.message}")
             }
         }

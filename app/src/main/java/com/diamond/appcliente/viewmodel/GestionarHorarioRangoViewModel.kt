@@ -35,7 +35,7 @@ class GestionarHorarioRangoViewModel @Inject constructor(
                 if (response.isSuccessful && response.body() != null) {
                     val body = response.body()!!
                     if (body.status == 200 && body.data != null) {
-                        _horarios.value = body.data
+                        _horarios.value = body.data ?: emptyList()
                     } else {
                         Log.e("GestionarHorarioRangoViewModel", "Error en datos: ${body.message}")
                         _error.emit("Error en los datos de la respuesta")

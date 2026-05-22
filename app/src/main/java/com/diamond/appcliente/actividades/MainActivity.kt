@@ -3,10 +3,12 @@ package com.diamond.appcliente.actividades
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var campoContraseña: EditText
     private lateinit var btnIngresarApp: Button
     private lateinit var btnOlvideContrasena: Button
+    private lateinit var progressLogin: ProgressBar
     private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         campoContraseña = findViewById(R.id.campoContraseña)
         btnIngresarApp = findViewById(R.id.btnIngresarApp)
         btnOlvideContrasena = findViewById(R.id.btnOlvideContrasena)
+        progressLogin = findViewById(R.id.progressLogin)
 
         val shakeAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
 
@@ -78,7 +82,14 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mainViewModel.loginResult.collect { result ->
                     when (result) {
+                        is MainViewModel.LoginResult.Loading -> {
+                            Log.d("MainActivity", "Login en progreso...")
+                            progressLogin.visibility = View.VISIBLE
+                            btnIngresarApp.isEnabled = false
+                        }
                         is MainViewModel.LoginResult.Success -> {
+                            progressLogin.visibility = View.GONE
+                            btnIngresarApp.isEnabled = true
                             val intent = Intent(this@MainActivity, ClienteHomeActivity::class.java)
                             intent.putExtra("nombre", result.nombre)
                             intent.putExtra("apellido", result.apellido)
@@ -86,10 +97,15 @@ class MainActivity : AppCompatActivity() {
                             startActivity(intent)
                             finish()
                         }
-                        is MainViewModel.LoginResult.Error -> when (result.message) {
-                            "NO_USER" -> Toast.makeText(this@MainActivity, "Rol no autorizado", Toast.LENGTH_SHORT).show()
-                            "INVALID" -> Toast.makeText(this@MainActivity, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
-                            else -> Toast.makeText(this@MainActivity, "Error: ${result.message}", Toast.LENGTH_SHORT).show()
+                        is MainViewModel.LoginResult.Error -> {
+                            progressLogin.visibility = View.GONE
+                            btnIngresarApp.isEnabled = true
+                            Log.e("MainActivity", "Error de login: ${result.message}")
+                            when (result.message) {
+                                "NO_USER" -> Toast.makeText(this@MainActivity, "Rol no autorizado", Toast.LENGTH_SHORT).show()
+                                "INVALID" -> Toast.makeText(this@MainActivity, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+                                else -> Toast.makeText(this@MainActivity, "Error de conexión: ${result.message}", Toast.LENGTH_LONG).show()
+                            }
                         }
                         is MainViewModel.LoginResult.Idle -> Unit
                     }

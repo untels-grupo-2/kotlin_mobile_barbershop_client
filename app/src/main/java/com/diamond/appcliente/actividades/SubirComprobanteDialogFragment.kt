@@ -1,6 +1,7 @@
 package com.diamond.appcliente.actividades
 
 import android.app.Dialog
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -78,7 +79,7 @@ class SubirComprobanteDialogFragment : DialogFragment() {
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == requireActivity().RESULT_OK && requestCode == PICK_IMAGE_REQUEST && data != null) {
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST && data != null) {
             imagenSeleccionadaUri = data.data
         }
     }

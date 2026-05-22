@@ -60,7 +60,7 @@ class ListarRangoHorarios : AppCompatActivity() {
         val servicio_id = intent.getIntExtra("servicio_id", -1)
 
         Log.d("ListarRangoHorarios", "Servicio ID recibido: $servicio_id")
-        servicio = ServicioRequest(nombreServicio, precioServicio, imagenUrlServicio, servicio_id)
+        servicio = ServicioRequest(nombreServicio ?: "", precioServicio, imagenUrlServicio ?: "", servicio_id)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = Color.BLACK
@@ -103,11 +103,11 @@ class ListarRangoHorarios : AppCompatActivity() {
                     gestionarHorarioRangoViewModel.horarios.collect { horarios ->
                         if (horarios.isEmpty()) return@collect
                         val todosHorarios = mutableListOf<HorarioRangoDto>()
-                        todosHorarios.add(HorarioRangoDto("🌅 Turno mañana", "Encabezado"))
+                        todosHorarios.add(HorarioRangoDto(rango = "🌅 Turno mañana", tipoHorario = "Encabezado"))
                         horarios.filter { it.tipoHorario == "MAÑANA" }.forEach { todosHorarios.add(it) }
-                        todosHorarios.add(HorarioRangoDto("☀️ Turno tarde", "Encabezado"))
+                        todosHorarios.add(HorarioRangoDto(rango = "☀️ Turno tarde", tipoHorario = "Encabezado"))
                         horarios.filter { it.tipoHorario == "TARDE" }.forEach { todosHorarios.add(it) }
-                        todosHorarios.add(HorarioRangoDto("🌙 Turno noche", "Encabezado"))
+                        todosHorarios.add(HorarioRangoDto(rango = "🌙 Turno noche", tipoHorario = "Encabezado"))
                         horarios.filter { it.tipoHorario == "NOCHE" }.forEach { todosHorarios.add(it) }
                         ordenarHorarios(todosHorarios)
                         setUpRecyclerView(todosHorarios)

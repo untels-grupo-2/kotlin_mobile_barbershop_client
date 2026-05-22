@@ -153,14 +153,14 @@ class ClienteHomeActivity : AppCompatActivity() {
     private fun updateMetaProgress(reservasRealizadas: Int) {
         metaProgresoTexto.text = "$reservasRealizadas/7 Cortes"
         val progresoImagenId = when (reservasRealizadas) {
-            1 -> R.drawable.racha_1
-            2 -> R.drawable.racha_2
-            3 -> R.drawable.racha_3
-            4 -> R.drawable.racha_4
-            5 -> R.drawable.racha_5
-            6 -> R.drawable.racha_6
-            7 -> R.drawable.racha_7
-            else -> R.drawable.racha_0
+            1 -> R.drawable.racha
+            2 -> R.drawable.racha
+            3 -> R.drawable.racha
+            4 -> R.drawable.racha
+            5 -> R.drawable.racha
+            6 -> R.drawable.racha
+            7 -> R.drawable.racha
+            else -> R.drawable.racha
         }
         metaProgresoImagen.setImageResource(progresoImagenId)
     }
