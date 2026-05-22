@@ -9,9 +9,13 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.RecuperarContraViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RecuperarContraActivity : AppCompatActivity() {
@@ -48,17 +52,24 @@ class RecuperarContraActivity : AppCompatActivity() {
             finish()
         }
 
-        viewModel.resultado.observe(this) { mensaje ->
-            Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
-            finish()
-        }
-
-        viewModel.error.observe(this) { mensaje ->
-            Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = Color.BLACK
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.resultado.collect { mensaje ->
+                        Toast.makeText(this@RecuperarContraActivity, mensaje, Toast.LENGTH_LONG).show()
+                        finish()
+                    }
+                }
+                launch {
+                    viewModel.error.collect { mensaje ->
+                        Toast.makeText(this@RecuperarContraActivity, mensaje, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
         }
     }
 }

@@ -10,6 +10,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -18,6 +21,7 @@ import com.diamond.appcliente.adapters.BarberoAdapter
 import com.diamond.appcliente.dto.barbero.BarberoDto
 import com.diamond.appcliente.viewmodel.GestionarBarberoViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class GestionarBarberoActivity : AppCompatActivity() {
@@ -70,27 +74,31 @@ class GestionarBarberoActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnReservar).setOnClickListener { mostrarPopupConfirmacion() }
 
-        cargarLista()
-    }
-
-    private fun cargarLista() {
-        viewModel.obtenerBarberos(object : GestionarBarberoViewModel.BarberoCallback {
-            override fun onSuccess(barberos: List<BarberoDto>?) {
-                barberos ?: return
-                adapter = BarberoAdapter(barberos, object : BarberoAdapter.OnBarberoClickListener {
-                    override fun onBarberoSeleccionado(barbero: BarberoDto, nombreBarbero: String?) {
-                        nombreBarberoSeleccionado = nombreBarbero
-                        Toast.makeText(this@GestionarBarberoActivity, "Barbero seleccionado: $nombreBarbero", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.barberos.collect { barberos ->
+                        if (barberos.isEmpty()) return@collect
+                        adapter = BarberoAdapter(barberos, object : BarberoAdapter.OnBarberoClickListener {
+                            override fun onBarberoSeleccionado(barbero: BarberoDto, nombreBarbero: String?) {
+                                nombreBarberoSeleccionado = nombreBarbero
+                                Toast.makeText(this@GestionarBarberoActivity, "Barbero seleccionado: $nombreBarbero", Toast.LENGTH_SHORT).show()
+                            }
+                            override fun onActualizar(barbero: BarberoDto) {}
+                            override fun onEliminar(barbero: BarberoDto) {}
+                        })
+                        recyclerView.adapter = adapter
                     }
-                    override fun onActualizar(barbero: BarberoDto) {}
-                    override fun onEliminar(barbero: BarberoDto) {}
-                })
-                recyclerView.adapter = adapter
+                }
+                launch {
+                    viewModel.error.collect { msg ->
+                        Toast.makeText(this@GestionarBarberoActivity, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
-            override fun onError(mensaje: String?) {
-                Toast.makeText(this@GestionarBarberoActivity, mensaje, Toast.LENGTH_SHORT).show()
-            }
-        })
+        }
+
+        viewModel.cargarBarberos()
     }
 
     private fun mostrarPopupConfirmacion() {

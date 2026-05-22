@@ -13,10 +13,14 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.valoracion.ValoracionRequest
 import com.diamond.appcliente.viewmodel.GestionarValoracionViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ValoracionActivity : AppCompatActivity() {
@@ -30,7 +34,6 @@ class ValoracionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_valoracion)
 
-        val token = intent.getStringExtra("token")
         Log.d("ValoracionActivity", "Nombre: ${intent.getStringExtra("nombre")} | Apellido: ${intent.getStringExtra("apellido")}")
 
         radioGroupValoracion = findViewById(R.id.radioGroupValoracion)
@@ -47,6 +50,33 @@ class ValoracionActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnEnviarValoracion).setOnClickListener { enviarValoracion() }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.evento.collect { evento ->
+                    when (evento) {
+                        is GestionarValoracionViewModel.ValoracionUiEvent.Exito -> {
+                            val dialogView = layoutInflater.inflate(R.layout.dialog_valoracion_exitosa, null)
+                            val dialog = AlertDialog.Builder(this@ValoracionActivity, R.style.ReservaDialogTheme)
+                                .setView(dialogView).setCancelable(true).create()
+
+                            dialogView.findViewById<Button>(R.id.btnOk).setOnClickListener {
+                                dialog.dismiss()
+                                startActivity(Intent(this@ValoracionActivity, ClienteHomeActivity::class.java))
+                                finish()
+                            }
+                            dialog.setOnCancelListener {
+                                startActivity(Intent(this@ValoracionActivity, ClienteHomeActivity::class.java))
+                                finish()
+                            }
+                            dialog.show()
+                        }
+                        is GestionarValoracionViewModel.ValoracionUiEvent.Error ->
+                            Toast.makeText(this@ValoracionActivity, "Error: ${evento.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun enviarValoracion() {
@@ -55,27 +85,7 @@ class ValoracionActivity : AppCompatActivity() {
         val mensaje = editTextComentario.text.toString()
 
         if (valoracion != -1 && utilidad != null && mensaje.isNotEmpty()) {
-            viewModel.enviarValoracion(ValoracionRequest(valoracion, utilidad, mensaje), object : GestionarValoracionViewModel.ValoracionCallback {
-                override fun onSuccess(message: String) {
-                    val dialogView = layoutInflater.inflate(R.layout.dialog_valoracion_exitosa, null)
-                    val dialog = AlertDialog.Builder(this@ValoracionActivity, R.style.ReservaDialogTheme)
-                        .setView(dialogView).setCancelable(true).create()
-
-                    dialogView.findViewById<Button>(R.id.btnOk).setOnClickListener {
-                        dialog.dismiss()
-                        startActivity(Intent(this@ValoracionActivity, ClienteHomeActivity::class.java))
-                        finish()
-                    }
-                    dialog.setOnCancelListener {
-                        startActivity(Intent(this@ValoracionActivity, ClienteHomeActivity::class.java))
-                        finish()
-                    }
-                    dialog.show()
-                }
-                override fun onError(message: String?) {
-                    Toast.makeText(this@ValoracionActivity, "Error: $message", Toast.LENGTH_SHORT).show()
-                }
-            })
+            viewModel.enviarValoracion(ValoracionRequest(valoracion, utilidad, mensaje))
         } else {
             Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
         }

@@ -2,14 +2,15 @@ package com.diamond.appcliente.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.reserva.DtoReserva
-import com.diamond.appcliente.dto.reserva.ReservaResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,52 +18,45 @@ class GestionarReservaViewModel @Inject constructor(
     @AuthenticatedApi private val authApiService: AuthApiService
 ) : ViewModel() {
 
-    interface ReservaCallback {
-        fun onSuccess(message: String)
-        fun onError(message: String)
+    sealed class ReservaUiEvent {
+        data class Exito(val message: String) : ReservaUiEvent()
+        data class Error(val message: String) : ReservaUiEvent()
     }
 
-    fun enviarReserva(request: DtoReserva, callback: ReservaCallback) {
-        authApiService.crearReserva(request).enqueue(object : Callback<ReservaResponse> {
-            override fun onResponse(call: Call<ReservaResponse>, response: Response<ReservaResponse>) {
+    private val _evento = MutableSharedFlow<ReservaUiEvent>()
+    val evento: SharedFlow<ReservaUiEvent> = _evento.asSharedFlow()
+
+    fun enviarReserva(request: DtoReserva) {
+        viewModelScope.launch {
+            try {
+                val response = authApiService.crearReserva(request)
                 if (response.isSuccessful) {
-                    callback.onSuccess("Reserva creada con éxito")
+                    _evento.emit(ReservaUiEvent.Exito("Reserva creada con éxito"))
                 } else {
-                    val errorMessage = try {
-                        response.errorBody()?.string() ?: response.message()
-                    } catch (e: Exception) {
-                        "Error al obtener los detalles del error"
-                    }
-                    callback.onError("Error al crear la reserva: $errorMessage")
+                    val errorMsg = try { response.errorBody()?.string() ?: response.message() } catch (e: Exception) { "Error desconocido" }
+                    _evento.emit(ReservaUiEvent.Error("Error al crear la reserva: $errorMsg"))
                 }
+            } catch (e: Exception) {
+                Log.e("GestionarReservaViewModel", "Error de conexión", e)
+                _evento.emit(ReservaUiEvent.Error("Fallo en la conexión: ${e.message}"))
             }
-            override fun onFailure(call: Call<ReservaResponse>, t: Throwable) {
-                val errorMessage = "Fallo en la conexión: ${t.message}"
-                Log.e("ReservaError", errorMessage, t)
-                callback.onError(errorMessage)
-            }
-        })
+        }
     }
 
-    fun crearReservaRecompensa(request: DtoReserva, callback: ReservaCallback) {
-        authApiService.crearReservaRecompensa(request).enqueue(object : Callback<ReservaResponse> {
-            override fun onResponse(call: Call<ReservaResponse>, response: Response<ReservaResponse>) {
+    fun crearReservaRecompensa(request: DtoReserva) {
+        viewModelScope.launch {
+            try {
+                val response = authApiService.crearReservaRecompensa(request)
                 if (response.isSuccessful) {
-                    callback.onSuccess("Reserva con recompensa creada con éxito")
+                    _evento.emit(ReservaUiEvent.Exito("Reserva con recompensa creada con éxito"))
                 } else {
-                    val errorMessage = try {
-                        response.errorBody()?.string() ?: response.message()
-                    } catch (e: Exception) {
-                        "Error al obtener los detalles del error"
-                    }
-                    callback.onError("Error al crear la reserva: $errorMessage")
+                    val errorMsg = try { response.errorBody()?.string() ?: response.message() } catch (e: Exception) { "Error desconocido" }
+                    _evento.emit(ReservaUiEvent.Error("Error al crear la reserva: $errorMsg"))
                 }
+            } catch (e: Exception) {
+                Log.e("GestionarReservaViewModel", "Error de conexión", e)
+                _evento.emit(ReservaUiEvent.Error("Fallo en la conexión: ${e.message}"))
             }
-            override fun onFailure(call: Call<ReservaResponse>, t: Throwable) {
-                val errorMessage = "Fallo en la conexión: ${t.message}"
-                Log.e("ReservaError", errorMessage, t)
-                callback.onError(errorMessage)
-            }
-        })
+        }
     }
 }

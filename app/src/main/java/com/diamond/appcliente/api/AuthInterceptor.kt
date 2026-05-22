@@ -24,7 +24,7 @@ class AuthInterceptor @Inject constructor(
 
         val response = chain.proceed(requestWithToken)
 
-        if (response.code == 401) {
+        if (response.code() == 401) {
             response.close()
             val newToken = tokenManager.refreshToken()
             if (newToken != null) {
