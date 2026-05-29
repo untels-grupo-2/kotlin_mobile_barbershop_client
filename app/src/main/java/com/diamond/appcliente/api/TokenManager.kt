@@ -11,22 +11,34 @@ class TokenManager @Inject constructor(
 ) {
 
     @Synchronized
-    fun refreshToken(): String? {
-        val currentRefresh = prefs.obtenerRefreshToken() ?: return null
-
-        val response = authApi.refresh(RefreshRequest(currentRefresh)).execute()
-
-        if (response.isSuccessful) {
-            val body = response.body()?.data ?: return null
-            val newToken = body.token ?: return null
-            val newRefresh = body.refreshToken ?: return null
-
-            prefs.guardarToken(newToken)
-            prefs.guardarRefreshToken(newRefresh)
-
-            return newToken
+    fun refreshToken(expiredToken: String): String? {
+        // Si otro hilo ya refrescó el token mientras esperábamos el lock, lo devolvemos directamente
+        val currentToken = prefs.obtenerToken()
+        if (currentToken != null && currentToken != expiredToken) {
+            return currentToken
         }
 
-        return null
+        val refreshToken = prefs.obtenerRefreshToken() ?: run {
+            prefs.limpiarPreferencias()
+            return null
+        }
+
+        return try {
+            val response = authApi.refresh(RefreshRequest(refreshToken)).execute()
+            if (response.isSuccessful) {
+                val body = response.body()?.data ?: return null
+                val newToken = body.token ?: return null
+                val newRefresh = body.refreshToken ?: return null
+                prefs.guardarToken(newToken)
+                prefs.guardarRefreshToken(newRefresh)
+                newToken
+            } else {
+                // Refresh token caducado — limpiar sesión
+                prefs.limpiarPreferencias()
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 }

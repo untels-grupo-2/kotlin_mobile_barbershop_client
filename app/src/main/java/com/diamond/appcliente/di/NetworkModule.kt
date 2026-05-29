@@ -6,6 +6,7 @@ import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.api.AuthInterceptor
 import com.diamond.appcliente.api.TokenManager
 import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.appcliente.util.SessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -63,8 +64,9 @@ object NetworkModule {
     @Singleton
     fun provideAuthInterceptor(
         preferenciasHelper: PreferenciasHelper,
-        tokenManager: TokenManager
-    ): AuthInterceptor = AuthInterceptor(preferenciasHelper, tokenManager)
+        tokenManager: TokenManager,
+        sessionManager: SessionManager
+    ): AuthInterceptor = AuthInterceptor(preferenciasHelper, tokenManager, sessionManager)
 
     @Provides
     @Singleton

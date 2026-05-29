@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.os.Bundle
@@ -20,7 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ListarReservaActivity : AppCompatActivity() {
+class ListarReservaActivity : AuthActivity() {
 
     private lateinit var listarReservaAdapter: ListarReservaAdapter
     private val listarReservaViewModel: ListarReservaViewModel by viewModels()

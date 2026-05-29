@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.os.Bundle
 import android.widget.Button
@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class GestionarServicioActivity : AppCompatActivity() {
+class GestionarServicioActivity : AuthActivity() {
 
     private val viewModel: GestionarServicioViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView

@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -29,7 +29,7 @@ import java.io.File
 import java.io.IOException
 
 @AndroidEntryPoint
-class SubirComprobanteActivity : AppCompatActivity() {
+class SubirComprobanteActivity : AuthActivity() {
 
     private lateinit var imagePreview: ImageView
     private var imagenSeleccionadaUri: Uri? = null

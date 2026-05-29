@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.net.Uri
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class UsuarioActivity : AppCompatActivity() {
+class UsuarioActivity : AuthActivity() {
 
     private lateinit var btnLogoutUser: Button
     private lateinit var imageUsuario: ImageView
