@@ -1,13 +1,15 @@
 package com.diamond.appcliente.api
 
 import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.appcliente.util.SessionManager
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
     private val preferenciasHelper: PreferenciasHelper,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val sessionManager: SessionManager
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -26,12 +28,15 @@ class AuthInterceptor @Inject constructor(
 
         if (response.code() == 401) {
             response.close()
-            val newToken = tokenManager.refreshToken()
+            val newToken = tokenManager.refreshToken(token ?: "")
             if (newToken != null) {
                 val newRequest = originalRequest.newBuilder()
                     .header("Authorization", "Bearer $newToken")
                     .build()
                 return chain.proceed(newRequest)
+            } else {
+                // Refresh falló — sesión expirada, notificar a la UI
+                sessionManager.onSessionExpired()
             }
         }
 

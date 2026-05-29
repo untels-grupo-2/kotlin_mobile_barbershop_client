@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.graphics.Color
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SeccionServiciosActivity : AppCompatActivity() {
+class SeccionServiciosActivity : AuthActivity() {
 
     @Inject lateinit var preferenciasHelper: PreferenciasHelper
 

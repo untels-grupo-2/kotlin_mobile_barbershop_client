@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.graphics.Color
@@ -28,7 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ClienteHomeActivity : AppCompatActivity() {
+class ClienteHomeActivity : AuthActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private var adapter: ServicioAdapter? = null

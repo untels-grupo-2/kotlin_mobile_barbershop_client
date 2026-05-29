@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.app.Dialog
 import android.content.Intent
@@ -24,7 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class GestionarBarberoActivity : AppCompatActivity() {
+class GestionarBarberoActivity : AuthActivity() {
 
     private val viewModel: GestionarBarberoViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView

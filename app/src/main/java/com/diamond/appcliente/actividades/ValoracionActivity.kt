@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.graphics.Color
@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ValoracionActivity : AppCompatActivity() {
+class ValoracionActivity : AuthActivity() {
 
     private lateinit var radioGroupValoracion: RadioGroup
     private lateinit var radioGroupFacilidad: RadioGroup

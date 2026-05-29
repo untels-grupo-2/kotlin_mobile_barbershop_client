@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.app.DatePickerDialog
 import android.content.Intent
@@ -32,7 +32,7 @@ import java.util.Calendar
 import java.util.Locale
 
 @AndroidEntryPoint
-class ListarRangoHorarios : AppCompatActivity() {
+class ListarRangoHorarios : AuthActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var horarioRangoAdapter: HorarioRangoAdapter

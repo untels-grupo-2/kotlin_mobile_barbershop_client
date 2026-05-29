@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.graphics.Color
@@ -24,7 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class VerBarberosActivity : AppCompatActivity() {
+class VerBarberosActivity : AuthActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private var adapter: BarberoDisponibleAdapter? = null

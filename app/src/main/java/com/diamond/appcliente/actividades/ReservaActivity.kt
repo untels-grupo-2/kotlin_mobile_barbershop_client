@@ -1,4 +1,4 @@
-package com.diamond.appcliente.actividades
+﻿package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.graphics.Color
@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 @AndroidEntryPoint
-class ReservaActivity : AppCompatActivity() {
+class ReservaActivity : AuthActivity() {
 
     private lateinit var textViewBarbero: TextView
     private lateinit var textViewHorario: TextView
