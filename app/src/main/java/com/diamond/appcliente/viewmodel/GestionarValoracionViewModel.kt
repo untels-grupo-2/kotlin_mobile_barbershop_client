@@ -2,9 +2,8 @@ package com.diamond.appcliente.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diamond.appcliente.api.AuthApiService
-import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.valoracion.ValoracionRequest
+import com.diamond.appcliente.repository.ValoracionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -14,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GestionarValoracionViewModel @Inject constructor(
-    @AuthenticatedApi private val authApiService: AuthApiService
+    private val valoracionRepository: ValoracionRepository
 ) : ViewModel() {
 
     sealed class ValoracionUiEvent {
@@ -28,12 +27,7 @@ class GestionarValoracionViewModel @Inject constructor(
     fun enviarValoracion(request: ValoracionRequest) {
         viewModelScope.launch {
             try {
-                val response = authApiService.crearValoracion(request)
-                if (response.isSuccessful) {
-                    _evento.emit(ValoracionUiEvent.Exito("Valoración enviada con éxito"))
-                } else {
-                    _evento.emit(ValoracionUiEvent.Error("Error al enviar la valoración"))
-                }
+                _evento.emit(ValoracionUiEvent.Exito(valoracionRepository.crearValoracion(request)))
             } catch (e: Exception) {
                 _evento.emit(ValoracionUiEvent.Error(e.message ?: "Error desconocido"))
             }

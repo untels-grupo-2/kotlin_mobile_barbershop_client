@@ -2,10 +2,8 @@ package com.diamond.appcliente.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diamond.appcliente.api.AuthApiService
-import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.barbero.BarberoDto
-import com.diamond.appcliente.dto.barbero.BarberoRequest
+import com.diamond.appcliente.repository.BarberoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GestionarBarberoViewModel @Inject constructor(
-    @AuthenticatedApi private val authApiService: AuthApiService
+    private val barberoRepository: BarberoRepository
 ) : ViewModel() {
 
     private val _barberos = MutableStateFlow<List<BarberoDto>>(emptyList())
@@ -33,12 +31,7 @@ class GestionarBarberoViewModel @Inject constructor(
     fun cargarBarberos() {
         viewModelScope.launch {
             try {
-                val response = authApiService.listarBarberos()
-                if (response.isSuccessful && response.body() != null) {
-                    _barberos.value = response.body()!!.data ?: emptyList()
-                } else {
-                    _error.emit("Error al obtener barberos")
-                }
+                _barberos.value = barberoRepository.listarBarberos()
             } catch (e: Exception) {
                 _error.emit(e.message ?: "Error desconocido")
             }
@@ -48,13 +41,8 @@ class GestionarBarberoViewModel @Inject constructor(
     fun crearBarbero(nombre: String) {
         viewModelScope.launch {
             try {
-                val response = authApiService.crearBarbero(BarberoRequest(nombre))
-                if (response.isSuccessful && response.body() != null) {
-                    _mensaje.emit(response.body()!!.message ?: "Barbero creado")
-                    cargarBarberos()
-                } else {
-                    _error.emit("Error al crear barbero")
-                }
+                _mensaje.emit(barberoRepository.crearBarbero(nombre))
+                cargarBarberos()
             } catch (e: Exception) {
                 _error.emit(e.message ?: "Error desconocido")
             }
@@ -64,13 +52,8 @@ class GestionarBarberoViewModel @Inject constructor(
     fun actualizarBarbero(id: Int, nuevoNombre: String) {
         viewModelScope.launch {
             try {
-                val response = authApiService.actualizarBarbero(id, BarberoRequest(nuevoNombre))
-                if (response.isSuccessful && response.body() != null) {
-                    _mensaje.emit(response.body()!!.message ?: "Barbero actualizado")
-                    cargarBarberos()
-                } else {
-                    _error.emit("Error al actualizar barbero")
-                }
+                _mensaje.emit(barberoRepository.actualizarBarbero(id, nuevoNombre))
+                cargarBarberos()
             } catch (e: Exception) {
                 _error.emit(e.message ?: "Error desconocido")
             }
@@ -80,13 +63,8 @@ class GestionarBarberoViewModel @Inject constructor(
     fun eliminarBarbero(id: Int) {
         viewModelScope.launch {
             try {
-                val response = authApiService.eliminarBarbero(id)
-                if (response.isSuccessful && response.body() != null) {
-                    _mensaje.emit(response.body()!!.message ?: "Barbero eliminado")
-                    cargarBarberos()
-                } else {
-                    _error.emit("Error al eliminar barbero")
-                }
+                _mensaje.emit(barberoRepository.eliminarBarbero(id))
+                cargarBarberos()
             } catch (e: Exception) {
                 _error.emit(e.message ?: "Error desconocido")
             }

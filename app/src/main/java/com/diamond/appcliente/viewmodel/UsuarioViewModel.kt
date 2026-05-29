@@ -5,9 +5,8 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diamond.appcliente.api.AuthApiService
-import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.usuario.UsuarioDto
+import com.diamond.appcliente.repository.UsuarioRepository
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,7 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UsuarioViewModel @Inject constructor(
-    @AuthenticatedApi private val authApiService: AuthApiService,
+    private val usuarioRepository: UsuarioRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -43,12 +42,7 @@ class UsuarioViewModel @Inject constructor(
     fun obtenerMiUsuario() {
         viewModelScope.launch {
             try {
-                val response = authApiService.obtenerMiUsuario()
-                if (response.isSuccessful && response.body() != null) {
-                    _usuario.value = response.body()!!.data
-                } else {
-                    _error.emit("Error al obtener usuario")
-                }
+                _usuario.value = usuarioRepository.obtenerMiUsuario()
             } catch (e: Exception) {
                 _error.emit(e.message ?: "Error desconocido")
             }
@@ -62,7 +56,7 @@ class UsuarioViewModel @Inject constructor(
             if (dtoUsuario.celular.isNullOrEmpty()) { _error.emit("El campo celular no puede estar vacío"); return@launch }
 
             val requestBody = RequestBody.create(MediaType.parse("application/json"), Gson().toJson(dtoUsuario))
-            Log.d("UsuarioViewModel", "Datos del usuario enviados: ${Gson().toJson(dtoUsuario)}")
+            Log.d("UsuarioViewModel", "Datos enviados: ${Gson().toJson(dtoUsuario)}")
 
             val imagenPart: MultipartBody.Part? = imagenUri?.let { uri ->
                 try {
@@ -79,16 +73,8 @@ class UsuarioViewModel @Inject constructor(
             }
 
             try {
-                val response = authApiService.actualizarMiPerfil(requestBody, imagenPart!!)
-                if (response.isSuccessful) {
-                    Log.d("UsuarioViewModel", "Actualización exitosa: ${response.body()}")
-                    _actualizarEvento.emit("Usuario actualizado exitosamente")
-                    obtenerMiUsuario()
-                } else {
-                    Log.e("UsuarioViewModel", "Error ${response.code()}: ${response.message()}")
-                    try { Log.e("UsuarioViewModel", "Error body: ${response.errorBody()?.string()}") } catch (e: Exception) { }
-                    _error.emit("Error al actualizar usuario")
-                }
+                _actualizarEvento.emit(usuarioRepository.actualizarMiPerfil(requestBody, imagenPart!!))
+                obtenerMiUsuario()
             } catch (e: Exception) {
                 Log.e("UsuarioViewModel", "Error al actualizar usuario", e)
                 _error.emit(e.message ?: "Error desconocido")

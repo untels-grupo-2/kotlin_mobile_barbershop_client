@@ -3,9 +3,8 @@ package com.diamond.appcliente.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diamond.appcliente.api.AuthApiService
-import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.reserva.DtoReserva
+import com.diamond.appcliente.repository.ReservaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GestionarReservaViewModel @Inject constructor(
-    @AuthenticatedApi private val authApiService: AuthApiService
+    private val reservaRepository: ReservaRepository
 ) : ViewModel() {
 
     sealed class ReservaUiEvent {
@@ -29,16 +28,10 @@ class GestionarReservaViewModel @Inject constructor(
     fun enviarReserva(request: DtoReserva) {
         viewModelScope.launch {
             try {
-                val response = authApiService.crearReserva(request)
-                if (response.isSuccessful) {
-                    _evento.emit(ReservaUiEvent.Exito("Reserva creada con éxito"))
-                } else {
-                    val errorMsg = try { response.errorBody()?.string() ?: response.message() } catch (e: Exception) { "Error desconocido" }
-                    _evento.emit(ReservaUiEvent.Error("Error al crear la reserva: $errorMsg"))
-                }
+                _evento.emit(ReservaUiEvent.Exito(reservaRepository.crearReserva(request)))
             } catch (e: Exception) {
-                Log.e("GestionarReservaViewModel", "Error de conexión", e)
-                _evento.emit(ReservaUiEvent.Error("Fallo en la conexión: ${e.message}"))
+                Log.e("GestionarReservaViewModel", "Error al crear reserva", e)
+                _evento.emit(ReservaUiEvent.Error("Error al crear la reserva: ${e.message}"))
             }
         }
     }
@@ -46,16 +39,10 @@ class GestionarReservaViewModel @Inject constructor(
     fun crearReservaRecompensa(request: DtoReserva) {
         viewModelScope.launch {
             try {
-                val response = authApiService.crearReservaRecompensa(request)
-                if (response.isSuccessful) {
-                    _evento.emit(ReservaUiEvent.Exito("Reserva con recompensa creada con éxito"))
-                } else {
-                    val errorMsg = try { response.errorBody()?.string() ?: response.message() } catch (e: Exception) { "Error desconocido" }
-                    _evento.emit(ReservaUiEvent.Error("Error al crear la reserva: $errorMsg"))
-                }
+                _evento.emit(ReservaUiEvent.Exito(reservaRepository.crearReservaRecompensa(request)))
             } catch (e: Exception) {
-                Log.e("GestionarReservaViewModel", "Error de conexión", e)
-                _evento.emit(ReservaUiEvent.Error("Fallo en la conexión: ${e.message}"))
+                Log.e("GestionarReservaViewModel", "Error al crear reserva recompensa", e)
+                _evento.emit(ReservaUiEvent.Error("Error al crear la reserva: ${e.message}"))
             }
         }
     }

@@ -3,9 +3,8 @@ package com.diamond.appcliente.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diamond.appcliente.api.AuthApiService
-import com.diamond.appcliente.di.AuthenticatedApi
 import com.diamond.appcliente.dto.reserva.ReservaResponse
+import com.diamond.appcliente.repository.ReservaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ListarReservaViewModel @Inject constructor(
-    @AuthenticatedApi private val apiService: AuthApiService
+    private val reservaRepository: ReservaRepository
 ) : ViewModel() {
 
     private val _reservas = MutableStateFlow<List<ReservaResponse>?>(null)
@@ -34,18 +33,10 @@ class ListarReservaViewModel @Inject constructor(
     fun cargarReservas() {
         viewModelScope.launch {
             _reservas.value = null
-            Log.d("ListarReservaViewModel", "Cargando reservas...")
             try {
-                val response = apiService.listarMisReservas()
-                Log.d("ListarReservaViewModel", "Respuesta: ${response.code()}")
-                if (response.isSuccessful && response.body() != null) {
-                    _reservas.value = response.body()!!.data ?: emptyList()
-                } else {
-                    Log.d("ListarReservaViewModel", "Sin reservas o error en respuesta")
-                    _reservas.value = emptyList()
-                }
+                _reservas.value = reservaRepository.listarMisReservas()
             } catch (e: Exception) {
-                Log.e("ListarReservaViewModel", "Error en la llamada a la API: ", e)
+                Log.e("ListarReservaViewModel", "Error al cargar reservas", e)
                 _reservas.value = emptyList()
             }
         }
@@ -54,12 +45,7 @@ class ListarReservaViewModel @Inject constructor(
     fun subirComprobante(reservaId: Long, imagenPart: MultipartBody.Part) {
         viewModelScope.launch {
             try {
-                val response = apiService.subirComprobante(reservaId, imagenPart)
-                if (response.isSuccessful) {
-                    _comprobanteEvento.emit("Comprobante subido correctamente.")
-                } else {
-                    _error.emit("Error al subir el comprobante.")
-                }
+                _comprobanteEvento.emit(reservaRepository.subirComprobante(reservaId, imagenPart))
             } catch (e: Exception) {
                 _error.emit(e.message ?: "Error desconocido")
             }
