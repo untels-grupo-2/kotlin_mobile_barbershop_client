@@ -1,9 +1,11 @@
 package com.diamond.appcliente.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.diamond.appcliente.util.PreferenciasHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -11,22 +13,25 @@ class ClienteHomeViewModel @Inject constructor(
     private val preferenciasHelper: PreferenciasHelper
 ) : ViewModel() {
 
-    val nombreCompleto = MutableLiveData<String>()
-    val imagenUrlCliente = MutableLiveData<String>()
+    private val _nombreCompleto = MutableStateFlow("")
+    val nombreCompleto: StateFlow<String> = _nombreCompleto.asStateFlow()
+
+    private val _imagenUrlCliente = MutableStateFlow<String?>(null)
+    val imagenUrlCliente: StateFlow<String?> = _imagenUrlCliente.asStateFlow()
 
     fun setNombreYApellido(nombre: String, apellido: String) {
-        nombreCompleto.value = "$nombre $apellido"
+        _nombreCompleto.value = "$nombre $apellido"
     }
 
     fun setImagenUrlCliente(imagenUrl: String) {
-        imagenUrlCliente.value = imagenUrl
+        _imagenUrlCliente.value = imagenUrl
     }
 
-    fun getNombreCliente(): String = nombreCompleto.value ?: "Desconocido"
+    fun getNombreCliente(): String = _nombreCompleto.value.ifEmpty { "Desconocido" }
 
-    fun getApellidoCliente(): String = nombreCompleto.value?.split(" ")?.getOrNull(1) ?: "Desconocido"
+    fun getApellidoCliente(): String = _nombreCompleto.value.split(" ").getOrNull(1) ?: "Desconocido"
 
-    fun getImagenUrlCliente(): String = imagenUrlCliente.value ?: "default"
+    fun getImagenUrlCliente(): String = _imagenUrlCliente.value ?: "default"
 
     fun cerrarSesion() = preferenciasHelper.limpiarPreferencias()
 }
