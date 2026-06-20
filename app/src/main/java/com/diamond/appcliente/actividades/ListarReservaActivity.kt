@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ListarReservaAdapter
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,18 +51,24 @@ class ListarReservaActivity : AuthActivity() {
 
         window.statusBarColor = -16777216
 
-        progressBar.visibility = View.VISIBLE
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                listarReservaViewModel.reservas.collect { reservas ->
-                    if (reservas != null) {
-                        progressBar.visibility = View.GONE
-                        if (reservas.isEmpty()) {
-                            Toast.makeText(this@ListarReservaActivity, "No se encontraron reservas", Toast.LENGTH_SHORT).show()
-                        } else {
-                            listarReservaAdapter.submitList(reservas)
+                listarReservaViewModel.reservas.collect { state ->
+                    when (state) {
+                        is UiState.Loading -> progressBar.visibility = View.VISIBLE
+                        is UiState.Success -> {
+                            progressBar.visibility = View.GONE
+                            if (state.data.isEmpty()) {
+                                Toast.makeText(this@ListarReservaActivity, "No se encontraron reservas", Toast.LENGTH_SHORT).show()
+                            } else {
+                                listarReservaAdapter.submitList(state.data)
+                            }
                         }
+                        is UiState.Error -> {
+                            progressBar.visibility = View.GONE
+                            Toast.makeText(this@ListarReservaActivity, state.message, Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {}
                     }
                 }
             }

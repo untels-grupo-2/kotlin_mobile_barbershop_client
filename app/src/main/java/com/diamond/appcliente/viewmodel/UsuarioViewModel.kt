@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diamond.appcliente.dto.usuario.UsuarioDto
 import com.diamond.appcliente.repository.UsuarioRepository
+import com.diamond.appcliente.ui.state.UiState
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -30,8 +31,8 @@ class UsuarioViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _usuario = MutableStateFlow<UsuarioDto?>(null)
-    val usuario: StateFlow<UsuarioDto?> = _usuario.asStateFlow()
+    private val _usuario = MutableStateFlow<UiState<UsuarioDto>>(UiState.Idle)
+    val usuario: StateFlow<UiState<UsuarioDto>> = _usuario.asStateFlow()
 
     private val _actualizarEvento = MutableSharedFlow<String>()
     val actualizarEvento: SharedFlow<String> = _actualizarEvento.asSharedFlow()
@@ -41,10 +42,12 @@ class UsuarioViewModel @Inject constructor(
 
     fun obtenerMiUsuario() {
         viewModelScope.launch {
+            _usuario.value = UiState.Loading
             try {
-                _usuario.value = usuarioRepository.obtenerMiUsuario()
+                val result = usuarioRepository.obtenerMiUsuario()
+                _usuario.value = if (result != null) UiState.Success(result) else UiState.Empty
             } catch (e: Exception) {
-                _error.emit(e.message ?: "Error desconocido")
+                _usuario.value = UiState.Error(e.message ?: "Error desconocido")
             }
         }
     }

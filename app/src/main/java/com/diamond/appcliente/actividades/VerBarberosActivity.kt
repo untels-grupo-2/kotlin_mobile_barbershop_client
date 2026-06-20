@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.BarberoDisponibleAdapter
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.HorarioBarberoInstanciaViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -76,12 +77,18 @@ class VerBarberosActivity : AuthActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.barberosDisponibles.collect { barberos ->
-                    if (barberos.isNotEmpty()) {
-                        adapter = BarberoDisponibleAdapter(barberos, this@VerBarberosActivity)
-                        recyclerView.adapter = adapter
-                    } else {
-                        Toast.makeText(this@VerBarberosActivity, "No hay barberos disponibles para esta fecha y horario", Toast.LENGTH_SHORT).show()
+                viewModel.barberosDisponibles.collect { state ->
+                    when (state) {
+                        is UiState.Success -> {
+                            if (state.data.isNotEmpty()) {
+                                adapter = BarberoDisponibleAdapter(state.data, this@VerBarberosActivity)
+                                recyclerView.adapter = adapter
+                            } else {
+                                Toast.makeText(this@VerBarberosActivity, "No hay barberos disponibles para esta fecha y horario", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        is UiState.Error -> Toast.makeText(this@VerBarberosActivity, state.message, Toast.LENGTH_SHORT).show()
+                        else -> {}
                     }
                 }
             }

@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.BarberoAdapter
 import com.diamond.appcliente.dto.barbero.BarberoDto
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarBarberoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -77,22 +78,24 @@ class GestionarBarberoActivity : AuthActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.barberos.collect { barberos ->
-                        if (barberos.isEmpty()) return@collect
-                        adapter = BarberoAdapter(barberos, object : BarberoAdapter.OnBarberoClickListener {
-                            override fun onBarberoSeleccionado(barbero: BarberoDto, nombreBarbero: String?) {
-                                nombreBarberoSeleccionado = nombreBarbero
-                                Toast.makeText(this@GestionarBarberoActivity, "Barbero seleccionado: $nombreBarbero", Toast.LENGTH_SHORT).show()
+                    viewModel.barberos.collect { state ->
+                        when (state) {
+                            is UiState.Success -> {
+                                if (state.data.isNotEmpty()) {
+                                    adapter = BarberoAdapter(state.data, object : BarberoAdapter.OnBarberoClickListener {
+                                        override fun onBarberoSeleccionado(barbero: BarberoDto, nombreBarbero: String?) {
+                                            nombreBarberoSeleccionado = nombreBarbero
+                                            Toast.makeText(this@GestionarBarberoActivity, "Barbero seleccionado: $nombreBarbero", Toast.LENGTH_SHORT).show()
+                                        }
+                                        override fun onActualizar(barbero: BarberoDto) {}
+                                        override fun onEliminar(barbero: BarberoDto) {}
+                                    })
+                                    recyclerView.adapter = adapter
+                                }
                             }
-                            override fun onActualizar(barbero: BarberoDto) {}
-                            override fun onEliminar(barbero: BarberoDto) {}
-                        })
-                        recyclerView.adapter = adapter
-                    }
-                }
-                launch {
-                    viewModel.error.collect { msg ->
-                        Toast.makeText(this@GestionarBarberoActivity, msg, Toast.LENGTH_SHORT).show()
+                            is UiState.Error -> Toast.makeText(this@GestionarBarberoActivity, state.message, Toast.LENGTH_SHORT).show()
+                            else -> {}
+                        }
                     }
                 }
             }

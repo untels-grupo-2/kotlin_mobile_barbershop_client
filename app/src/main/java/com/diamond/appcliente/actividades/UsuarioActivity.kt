@@ -22,6 +22,7 @@ import com.auth0.android.jwt.JWT
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.usuario.UsuarioDto
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.util.PreferenciasHelper
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -81,13 +82,19 @@ class UsuarioActivity : AuthActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.usuario.collect { usuario ->
-                        usuario ?: return@collect
-                        textNombre.text = "${usuario.nombre} ${usuario.apellido}"
-                        textEmail.text = usuario.email
-                        textCelular.text = usuario.celular
-                        Glide.with(this@UsuarioActivity).load(usuario.urlUsuario)
-                            .placeholder(R.drawable.perfil_default).into(imageUsuario)
+                    viewModel.usuario.collect { state ->
+                        when (state) {
+                            is UiState.Success -> {
+                                val usuario = state.data
+                                textNombre.text = "${usuario.nombre} ${usuario.apellido}"
+                                textEmail.text = usuario.email
+                                textCelular.text = usuario.celular
+                                Glide.with(this@UsuarioActivity).load(usuario.urlUsuario)
+                                    .placeholder(R.drawable.perfil_default).into(imageUsuario)
+                            }
+                            is UiState.Error -> Toast.makeText(this@UsuarioActivity, state.message, Toast.LENGTH_SHORT).show()
+                            else -> {}
+                        }
                     }
                 }
                 launch {
@@ -114,7 +121,7 @@ class UsuarioActivity : AuthActivity() {
         val editTextCelular = popupView.findViewById<EditText>(R.id.etCelularUsuario)
 
         if (preferenciasHelper.obtenerToken() != null) {
-            val u = viewModel.usuario.value
+            val u = (viewModel.usuario.value as? UiState.Success)?.data
             if (u != null) {
                 editTextNombre.setText(u.nombre)
                 editTextApellido.setText(u.apellido)

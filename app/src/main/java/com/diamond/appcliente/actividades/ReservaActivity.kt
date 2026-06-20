@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.reserva.DtoReserva
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarReservaViewModel
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.google.gson.Gson
@@ -88,9 +89,10 @@ class ReservaActivity : AuthActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    listarReservaViewModel.reservas.collect { reservas ->
-                        reservas ?: return@collect
-                        activarBotonReservaRecompensa(reservas.count { it.estRecompensa == 0 } >= 7)
+                    listarReservaViewModel.reservas.collect { state ->
+                        if (state is UiState.Success) {
+                            activarBotonReservaRecompensa(state.data.count { it.estRecompensa == 0 } >= 7)
+                        }
                     }
                 }
                 launch {
