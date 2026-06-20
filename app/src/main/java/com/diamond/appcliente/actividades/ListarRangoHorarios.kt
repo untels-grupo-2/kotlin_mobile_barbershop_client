@@ -21,6 +21,7 @@ import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.HorarioRangoAdapter
 import com.diamond.appcliente.dto.horariorango.HorarioRangoDto
 import com.diamond.appcliente.dto.servicio.ServicioRequest
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarHorarioRangoViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -100,22 +101,25 @@ class ListarRangoHorarios : AuthActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    gestionarHorarioRangoViewModel.horarios.collect { horarios ->
-                        if (horarios.isEmpty()) return@collect
-                        val todosHorarios = mutableListOf<HorarioRangoDto>()
-                        todosHorarios.add(HorarioRangoDto(rango = "🌅 Turno mañana", tipoHorario = "Encabezado"))
-                        horarios.filter { it.tipoHorario == "MAÑANA" }.forEach { todosHorarios.add(it) }
-                        todosHorarios.add(HorarioRangoDto(rango = "☀️ Turno tarde", tipoHorario = "Encabezado"))
-                        horarios.filter { it.tipoHorario == "TARDE" }.forEach { todosHorarios.add(it) }
-                        todosHorarios.add(HorarioRangoDto(rango = "🌙 Turno noche", tipoHorario = "Encabezado"))
-                        horarios.filter { it.tipoHorario == "NOCHE" }.forEach { todosHorarios.add(it) }
-                        ordenarHorarios(todosHorarios)
-                        setUpRecyclerView(todosHorarios)
-                    }
-                }
-                launch {
-                    gestionarHorarioRangoViewModel.error.collect { msg ->
-                        Toast.makeText(this@ListarRangoHorarios, msg, Toast.LENGTH_SHORT).show()
+                    gestionarHorarioRangoViewModel.horarios.collect { state ->
+                        when (state) {
+                            is UiState.Success -> {
+                                val horarios = state.data
+                                if (horarios.isNotEmpty()) {
+                                    val todosHorarios = mutableListOf<HorarioRangoDto>()
+                                    todosHorarios.add(HorarioRangoDto(rango = "🌅 Turno mañana", tipoHorario = "Encabezado"))
+                                    horarios.filter { it.tipoHorario == "MAÑANA" }.forEach { todosHorarios.add(it) }
+                                    todosHorarios.add(HorarioRangoDto(rango = "☀️ Turno tarde", tipoHorario = "Encabezado"))
+                                    horarios.filter { it.tipoHorario == "TARDE" }.forEach { todosHorarios.add(it) }
+                                    todosHorarios.add(HorarioRangoDto(rango = "🌙 Turno noche", tipoHorario = "Encabezado"))
+                                    horarios.filter { it.tipoHorario == "NOCHE" }.forEach { todosHorarios.add(it) }
+                                    ordenarHorarios(todosHorarios)
+                                    setUpRecyclerView(todosHorarios)
+                                }
+                            }
+                            is UiState.Error -> Toast.makeText(this@ListarRangoHorarios, state.message, Toast.LENGTH_SHORT).show()
+                            else -> {}
+                        }
                     }
                 }
             }

@@ -18,6 +18,7 @@ import com.auth0.android.jwt.JWT
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
 import com.diamond.appcliente.dto.servicio.ServicioDto
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.util.PreferenciasHelper
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -75,29 +76,31 @@ class SeccionServiciosActivity : AuthActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel1.servicios.collect { servicios ->
-                        if (servicios.isEmpty()) return@collect
-                        listaServicios = servicios
-                        adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
-                            override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
-                                Log.d("IntentData", "nombreServicio: ${servicio.nombre} | servicio_id: ${servicio.servicio_id}")
-                                val intent = Intent(this@SeccionServiciosActivity, ListarRangoHorarios::class.java)
-                                intent.putExtra("nombreServicio", servicio.nombre)
-                                intent.putExtra("servicio_id", servicio.servicio_id)
-                                intent.putExtra("descripcionServicio", servicio.descripcion)
-                                intent.putExtra("precioServicio", servicio.precio)
-                                intent.putExtra("imagenServicio", imagenUrl)
-                                intent.putExtra("nombre", nombreCliente)
-                                intent.putExtra("apellido", apellidoCliente)
-                                startActivity(intent)
+                    viewModel1.servicios.collect { state ->
+                        when (state) {
+                            is UiState.Success -> {
+                                if (state.data.isNotEmpty()) {
+                                    listaServicios = state.data
+                                    adapter = ServicioAdapter(state.data, object : ServicioAdapter.OnServicioClickListener {
+                                        override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
+                                            Log.d("IntentData", "nombreServicio: ${servicio.nombre} | servicio_id: ${servicio.servicio_id}")
+                                            val intent = Intent(this@SeccionServiciosActivity, ListarRangoHorarios::class.java)
+                                            intent.putExtra("nombreServicio", servicio.nombre)
+                                            intent.putExtra("servicio_id", servicio.servicio_id)
+                                            intent.putExtra("descripcionServicio", servicio.descripcion)
+                                            intent.putExtra("precioServicio", servicio.precio)
+                                            intent.putExtra("imagenServicio", imagenUrl)
+                                            intent.putExtra("nombre", nombreCliente)
+                                            intent.putExtra("apellido", apellidoCliente)
+                                            startActivity(intent)
+                                        }
+                                    })
+                                    recyclerView.adapter = adapter
+                                }
                             }
-                        })
-                        recyclerView.adapter = adapter
-                    }
-                }
-                launch {
-                    viewModel1.error.collect { msg ->
-                        Toast.makeText(this@SeccionServiciosActivity, msg, Toast.LENGTH_SHORT).show()
+                            is UiState.Error -> Toast.makeText(this@SeccionServiciosActivity, state.message, Toast.LENGTH_SHORT).show()
+                            else -> {}
+                        }
                     }
                 }
             }

@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
 import com.diamond.appcliente.dto.servicio.ServicioDto
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
@@ -82,50 +83,55 @@ class ClienteHomeActivity : AuthActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    usuarioViewModel.usuario.collect { usuario ->
-                        usuario ?: return@collect
-                        nombreCliente = usuario.nombre
-                        apellidoCliente = usuario.apellido
-                        clienteNombre.text = "${usuario.nombre} ${usuario.apellido}"
-                        if (!usuario.urlUsuario.isNullOrEmpty()) {
-                            Glide.with(this@ClienteHomeActivity).load(usuario.urlUsuario).into(clienteFoto)
-                        } else {
-                            clienteFoto.setImageResource(R.drawable.perfil_default)
+                    usuarioViewModel.usuario.collect { state ->
+                        if (state is UiState.Success) {
+                            val usuario = state.data
+                            nombreCliente = usuario.nombre
+                            apellidoCliente = usuario.apellido
+                            clienteNombre.text = "${usuario.nombre} ${usuario.apellido}"
+                            if (!usuario.urlUsuario.isNullOrEmpty()) {
+                                Glide.with(this@ClienteHomeActivity).load(usuario.urlUsuario).into(clienteFoto)
+                            } else {
+                                clienteFoto.setImageResource(R.drawable.perfil_default)
+                            }
                         }
                     }
                 }
                 launch {
-                    viewModel1.servicios.collect { servicios ->
-                        if (servicios.isEmpty()) return@collect
-                        listaServicios = servicios
-                        adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
-                            override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
-                                Log.d("IntentData", "nombreServicio: ${servicio.nombre} | servicio_id: ${servicio.servicio_id}")
-                                val intent = Intent(this@ClienteHomeActivity, ListarRangoHorarios::class.java)
-                                intent.putExtra("nombreServicio", servicio.nombre)
-                                intent.putExtra("servicio_id", servicio.servicio_id)
-                                intent.putExtra("descripcionServicio", servicio.descripcion)
-                                intent.putExtra("precioServicio", servicio.precio)
-                                intent.putExtra("imagenServicio", imagenUrl)
-                                intent.putExtra("nombre", nombreCliente)
-                                intent.putExtra("apellido", apellidoCliente)
-                                startActivity(intent)
+                    viewModel1.servicios.collect { state ->
+                        when (state) {
+                            is UiState.Success -> {
+                                if (state.data.isNotEmpty()) {
+                                    listaServicios = state.data
+                                    adapter = ServicioAdapter(state.data, object : ServicioAdapter.OnServicioClickListener {
+                                        override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {
+                                            Log.d("IntentData", "nombreServicio: ${servicio.nombre} | servicio_id: ${servicio.servicio_id}")
+                                            val intent = Intent(this@ClienteHomeActivity, ListarRangoHorarios::class.java)
+                                            intent.putExtra("nombreServicio", servicio.nombre)
+                                            intent.putExtra("servicio_id", servicio.servicio_id)
+                                            intent.putExtra("descripcionServicio", servicio.descripcion)
+                                            intent.putExtra("precioServicio", servicio.precio)
+                                            intent.putExtra("imagenServicio", imagenUrl)
+                                            intent.putExtra("nombre", nombreCliente)
+                                            intent.putExtra("apellido", apellidoCliente)
+                                            startActivity(intent)
+                                        }
+                                    })
+                                    recyclerView.adapter = adapter
+                                }
                             }
-                        })
-                        recyclerView.adapter = adapter
+                            is UiState.Error -> Toast.makeText(this@ClienteHomeActivity, state.message, Toast.LENGTH_SHORT).show()
+                            else -> {}
+                        }
                     }
                 }
                 launch {
-                    viewModel1.error.collect { msg ->
-                        Toast.makeText(this@ClienteHomeActivity, msg, Toast.LENGTH_SHORT).show()
-                    }
-                }
-                launch {
-                    listarReservaViewModel.reservas.collect { reservas ->
-                        reservas ?: return@collect
-                        var count = reservas.count { it.estRecompensa == 0 }
-                        if (count > 7) count = 7
-                        updateMetaProgress(count)
+                    listarReservaViewModel.reservas.collect { state ->
+                        if (state is UiState.Success) {
+                            var count = state.data.count { it.estRecompensa == 0 }
+                            if (count > 7) count = 7
+                            updateMetaProgress(count)
+                        }
                     }
                 }
             }

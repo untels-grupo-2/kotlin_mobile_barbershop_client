@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.diamond.appcliente.dto.servicio.ServicioDto
 import com.diamond.appcliente.dto.servicio.ServicioRequest
 import com.diamond.appcliente.repository.ServicioRepository
+import com.diamond.appcliente.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,21 +21,22 @@ class GestionarServicioViewModel @Inject constructor(
     private val servicioRepository: ServicioRepository
 ) : ViewModel() {
 
-    private val _servicios = MutableStateFlow<List<ServicioDto>>(emptyList())
-    val servicios: StateFlow<List<ServicioDto>> = _servicios.asStateFlow()
+    private val _servicios = MutableStateFlow<UiState<List<ServicioDto>>>(UiState.Idle)
+    val servicios: StateFlow<UiState<List<ServicioDto>>> = _servicios.asStateFlow()
 
     private val _mensaje = MutableSharedFlow<String>()
     val mensaje: SharedFlow<String> = _mensaje.asSharedFlow()
 
-    private val _error = MutableSharedFlow<String>()
-    val error: SharedFlow<String> = _error.asSharedFlow()
+    private val _crudError = MutableSharedFlow<String>()
+    val crudError: SharedFlow<String> = _crudError.asSharedFlow()
 
     fun cargarServicios() {
         viewModelScope.launch {
+            _servicios.value = UiState.Loading
             try {
-                _servicios.value = servicioRepository.listarServicios()
+                _servicios.value = UiState.Success(servicioRepository.listarServicios())
             } catch (e: Exception) {
-                _error.emit(e.message ?: "Error desconocido")
+                _servicios.value = UiState.Error(e.message ?: "Error desconocido")
             }
         }
     }
@@ -45,7 +47,7 @@ class GestionarServicioViewModel @Inject constructor(
                 _mensaje.emit(servicioRepository.crearServicio(request))
                 cargarServicios()
             } catch (e: Exception) {
-                _error.emit(e.message ?: "Error desconocido")
+                _crudError.emit(e.message ?: "Error desconocido")
             }
         }
     }
@@ -56,7 +58,7 @@ class GestionarServicioViewModel @Inject constructor(
                 _mensaje.emit(servicioRepository.actualizarServicio(id, request))
                 cargarServicios()
             } catch (e: Exception) {
-                _error.emit(e.message ?: "Error desconocido")
+                _crudError.emit(e.message ?: "Error desconocido")
             }
         }
     }
@@ -67,7 +69,7 @@ class GestionarServicioViewModel @Inject constructor(
                 _mensaje.emit(servicioRepository.eliminarServicio(id))
                 cargarServicios()
             } catch (e: Exception) {
-                _error.emit(e.message ?: "Error desconocido")
+                _crudError.emit(e.message ?: "Error desconocido")
             }
         }
     }

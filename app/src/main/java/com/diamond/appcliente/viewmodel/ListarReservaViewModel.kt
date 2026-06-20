@@ -1,10 +1,10 @@
 package com.diamond.appcliente.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diamond.appcliente.dto.reserva.ReservaResponse
 import com.diamond.appcliente.repository.ReservaRepository
+import com.diamond.appcliente.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +21,8 @@ class ListarReservaViewModel @Inject constructor(
     private val reservaRepository: ReservaRepository
 ) : ViewModel() {
 
-    private val _reservas = MutableStateFlow<List<ReservaResponse>?>(null)
-    val reservas: StateFlow<List<ReservaResponse>?> = _reservas.asStateFlow()
+    private val _reservas = MutableStateFlow<UiState<List<ReservaResponse>>>(UiState.Idle)
+    val reservas: StateFlow<UiState<List<ReservaResponse>>> = _reservas.asStateFlow()
 
     private val _comprobanteEvento = MutableSharedFlow<String>()
     val comprobanteEvento: SharedFlow<String> = _comprobanteEvento.asSharedFlow()
@@ -32,12 +32,11 @@ class ListarReservaViewModel @Inject constructor(
 
     fun cargarReservas() {
         viewModelScope.launch {
-            _reservas.value = null
+            _reservas.value = UiState.Loading
             try {
-                _reservas.value = reservaRepository.listarMisReservas()
+                _reservas.value = UiState.Success(reservaRepository.listarMisReservas())
             } catch (e: Exception) {
-                Log.e("ListarReservaViewModel", "Error al cargar reservas", e)
-                _reservas.value = emptyList()
+                _reservas.value = UiState.Error(e.message ?: "Error desconocido")
             }
         }
     }
