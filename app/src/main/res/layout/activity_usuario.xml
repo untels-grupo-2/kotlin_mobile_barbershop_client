@@ -84,6 +84,65 @@
                     android:textColorHint="#AAAAAA"
                     android:layout_marginBottom="16dp"/>
 
+                <!-- Card de progreso hacia reserva gratuita -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardProgresoRecompensa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="#2A2A2A"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mi progreso de recompensa"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:id="@+id/textProgresoReservas"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 de 7 reservas para tu próxima reserva gratuita"
+                            android:textColor="#CCCCCC"
+                            android:textSize="13sp"
+                            android:layout_marginBottom="10dp"/>
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progressRecompensa"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:progress="0"
+                            app:trackCornerRadius="8dp"
+                            app:indicatorColor="#FF9800"
+                            app:trackColor="#555555"
+                            android:layout_marginBottom="10dp"/>
+
+                        <TextView
+                            android:id="@+id/textRecompensaDisponible"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="¡Tienes una reserva gratis disponible!"
+                            android:textColor="#FF9800"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
                 <Button
                     android:id="@+id/buttonActualizarUsuario"
                     android:layout_width="match_parent"
@@ -93,7 +152,7 @@
                     android:backgroundTint="#FF9800"
                     android:textColor="#FFFFFF"
                     android:layout_marginBottom="12dp"
-                    android:layout_marginTop="24dp" />
+                    android:layout_marginTop="8dp" />
 
                 <Button
                     android:id="@+id/btnLogoutUser"

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -24,8 +25,10 @@ import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.usuario.UsuarioDto
 import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,7 +41,11 @@ class UsuarioActivity : AuthActivity() {
     private lateinit var textCelular: TextView
     private lateinit var textEmail: TextView
     private lateinit var textNombre: TextView
+    private lateinit var textProgresoReservas: TextView
+    private lateinit var progressRecompensa: LinearProgressIndicator
+    private lateinit var textRecompensaDisponible: TextView
     private val viewModel: UsuarioViewModel by viewModels()
+    private val listarReservaViewModel: ListarReservaViewModel by viewModels()
     private var imagenSeleccionadaUri: Uri? = null
 
     @Inject lateinit var preferenciasHelper: PreferenciasHelper
@@ -52,6 +59,9 @@ class UsuarioActivity : AuthActivity() {
         textEmail = findViewById(R.id.textEmail)
         textCelular = findViewById(R.id.textCelular)
         btnLogoutUser = findViewById(R.id.btnLogoutUser)
+        textProgresoReservas = findViewById(R.id.textProgresoReservas)
+        progressRecompensa = findViewById(R.id.progressRecompensa)
+        textRecompensaDisponible = findViewById(R.id.textRecompensaDisponible)
 
         val token = preferenciasHelper.obtenerToken()
         if (token != null) {
@@ -107,8 +117,29 @@ class UsuarioActivity : AuthActivity() {
                         Toast.makeText(this@UsuarioActivity, msg, Toast.LENGTH_SHORT).show()
                     }
                 }
+                launch {
+                    listarReservaViewModel.reservas.collect { state ->
+                        if (state is UiState.Success) {
+                            actualizarProgresoRecompensa(state.data.count { it.estRecompensa == 0 })
+                        }
+                    }
+                }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        listarReservaViewModel.cargarReservas()
+    }
+
+    private fun actualizarProgresoRecompensa(reservasAcumuladas: Int) {
+        val umbral = 7
+        val count = reservasAcumuladas.coerceAtMost(umbral)
+        val porcentaje = (count * 100) / umbral
+        textProgresoReservas.text = "$count de $umbral reservas para tu próxima reserva gratuita"
+        progressRecompensa.progress = porcentaje
+        textRecompensaDisponible.visibility = if (reservasAcumuladas >= umbral) View.VISIBLE else View.GONE
     }
 
     private fun mostrarPopupActualizar() {
