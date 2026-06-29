@@ -20,14 +20,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.HorarioRangoAdapter
 import com.diamond.appcliente.dto.horariorango.HorarioRangoDto
-import com.diamond.appcliente.dto.servicio.ServicioRequest
+import com.diamond.barbershop.shared.dto.servicio.ServicioRequest
 import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarHorarioRangoViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -170,27 +169,40 @@ class ListarRangoHorarios : AuthActivity() {
 
     private fun obtenerTipoHorario(botonSeleccionado: String): String {
         val parts = botonSeleccionado.split(" ")
-        var horaInt = parts[0].toInt()
-        val periodo = parts[1]
+        var horaInt = parts[0].toIntOrNull() ?: return "MAÑANA"
+        val periodo = if (parts.size > 1) parts[1].uppercase() else "AM"
         if (periodo == "PM" && horaInt != 12) horaInt += 12
-        else if (periodo == "AM" && horaInt == 12) horaInt = 0
+        else if (periodo == "AM" && horaInt == 12) horaInt = 12 // backend sends 12 AM for noon
         return when {
-            horaInt in 6 until 13 -> "MAÑANA"
-            horaInt in 13 until 18 -> "TARDE"
+            horaInt in 6..12 -> "MAÑANA"
+            horaInt in 13..17 -> "TARDE"
             else -> "NOCHE"
         }
     }
 
     private fun ordenarHorarios(todosHorarios: MutableList<HorarioRangoDto>) {
-        val format = SimpleDateFormat("h a")
-        todosHorarios.sortWith { o1, o2 ->
-            if (o1.tipoHorario == "Encabezado" && o2.tipoHorario == "Encabezado") return@sortWith 0
-            try {
-                val h1 = o1.rango?.split(" - ")?.get(0) ?: return@sortWith 0
-                val h2 = o2.rango?.split(" - ")?.get(0) ?: return@sortWith 0
-                format.parse(h1)!!.compareTo(format.parse(h2))
-            } catch (e: ParseException) { 0 }
+        val fmt = SimpleDateFormat("h a", java.util.Locale.US)
+
+        fun parseTime(rango: String?): Long {
+            val hora = rango?.split(" - ")?.get(0)?.trim() ?: return Long.MAX_VALUE
+            return try {
+                val fixed = if (hora == "12 AM") "12 PM" else hora
+                fmt.parse(fixed)?.time ?: Long.MAX_VALUE
+            } catch (e: Exception) { Long.MAX_VALUE }
         }
+
+        val mananaHeader = todosHorarios.firstOrNull { it.tipoHorario == "Encabezado" && it.rango?.contains("mañana") == true }
+        val tardeHeader  = todosHorarios.firstOrNull { it.tipoHorario == "Encabezado" && it.rango?.contains("tarde")  == true }
+        val nocheHeader  = todosHorarios.firstOrNull { it.tipoHorario == "Encabezado" && it.rango?.contains("noche")  == true }
+
+        val manana = todosHorarios.filter { it.tipoHorario == "MAÑANA" }.sortedBy { parseTime(it.rango) }
+        val tarde  = todosHorarios.filter { it.tipoHorario == "TARDE"  }.sortedBy { parseTime(it.rango) }
+        val noche  = todosHorarios.filter { it.tipoHorario == "NOCHE"  }.sortedBy { parseTime(it.rango) }
+
+        todosHorarios.clear()
+        if (mananaHeader != null) { todosHorarios.add(mananaHeader); todosHorarios.addAll(manana) }
+        if (tardeHeader  != null) { todosHorarios.add(tardeHeader);  todosHorarios.addAll(tarde)  }
+        if (nocheHeader  != null) { todosHorarios.add(nocheHeader);  todosHorarios.addAll(noche)  }
     }
 
     private fun confirmarReserva(

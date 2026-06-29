@@ -2,8 +2,8 @@ package com.diamond.appcliente.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diamond.appcliente.dto.servicio.ServicioDto
-import com.diamond.appcliente.dto.servicio.ServicioRequest
+import com.diamond.barbershop.shared.dto.servicio.ServicioDto
+import com.diamond.barbershop.shared.dto.servicio.ServicioRequest
 import com.diamond.appcliente.repository.ServicioRepository
 import com.diamond.appcliente.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel

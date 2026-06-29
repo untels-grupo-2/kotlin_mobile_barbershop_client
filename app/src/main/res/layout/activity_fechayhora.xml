@@ -169,14 +169,16 @@
             android:id="@+id/bottomNavigationView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#333333"
+            android:background="@drawable/bg_bottom_nav"
+            android:elevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:itemIconTint="@drawable/color_state_list"
-            app:itemTextColor="@color/white"
+            app:itemTextColor="@drawable/color_state_list"
             app:menu="@menu/bottom_nav_menu"
-            app:itemBackground="@drawable/no_ripple_background" />
+            app:itemBackground="@drawable/no_ripple_background"
+            app:itemRippleColor="@android:color/transparent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,6 +1,6 @@
 package com.diamond.appcliente.api
 
-import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.barbershop.shared.util.PreferenciasHelper
 import com.diamond.appcliente.util.SessionManager
 import okhttp3.Interceptor
 import okhttp3.Response

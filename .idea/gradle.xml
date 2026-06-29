@@ -9,6 +9,7 @@
         <option name="gradleJvm" value="jbr-21" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/../barbershop_shared" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
           </set>

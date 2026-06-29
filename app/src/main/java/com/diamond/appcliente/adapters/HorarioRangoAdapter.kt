@@ -1,15 +1,16 @@
 package com.diamond.appcliente.adapters
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.horariorango.HorarioRangoDto
+import com.google.android.material.button.MaterialButton
 
 class HorarioRangoAdapter(
     private val context: Context,
@@ -39,13 +40,21 @@ class HorarioRangoAdapter(
             holder.textHeader.text = horarios[position].rango
         } else if (holder is HorarioRangoViewHolder) {
             val horario = horarios[position]
-            holder.button.setBackgroundColor(
-                if (position == selectedPosition) Color.parseColor("#FF9800")
-                else Color.parseColor("#212121")
+            val isSelected = position == selectedPosition
+
+            holder.button.backgroundTintList = ColorStateList.valueOf(
+                if (isSelected) Color.parseColor("#251800") else Color.parseColor("#1E1E1E")
             )
-            holder.button.text = horario.rango
+            holder.button.strokeColor = ColorStateList.valueOf(
+                if (isSelected) Color.parseColor("#FF9800") else Color.parseColor("#444444")
+            )
+            holder.button.strokeWidth = if (isSelected) 3 else 1
+
+            val displayText = horario.rango?.replace("12 AM", "12 PM") ?: ""
+            holder.button.text = displayText
+
             holder.button.setOnClickListener {
-                selectedPosition = position
+                selectedPosition = holder.adapterPosition
                 notifyDataSetChanged()
                 listener.onHorarioSelected(horario.rango, horario.horarioRango_id)
             }
@@ -55,7 +64,7 @@ class HorarioRangoAdapter(
     override fun getItemCount() = horarios.size
 
     class HorarioRangoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val button: Button = itemView.findViewById(R.id.btnHorarioRango)
+        val button: MaterialButton = itemView.findViewById(R.id.btnHorarioRango)
     }
 
     class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

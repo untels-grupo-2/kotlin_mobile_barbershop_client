@@ -3,11 +3,11 @@ package com.diamond.appcliente.repository.impl
 import android.util.Log
 import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.di.AuthenticatedApi
-import com.diamond.appcliente.dto.barbero.BarberoDto
-import com.diamond.appcliente.dto.barbero.BarberoRequest
+import com.diamond.barbershop.shared.dto.barbero.BarberoDto
+import com.diamond.barbershop.shared.dto.barbero.BarberoRequest
 import com.diamond.appcliente.dto.barbero.DtoBarberoDisponible
 import com.diamond.appcliente.repository.BarberoRepository
-import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.barbershop.shared.util.PreferenciasHelper
 import javax.inject.Inject
 
 class BarberoRepositoryImpl @Inject constructor(

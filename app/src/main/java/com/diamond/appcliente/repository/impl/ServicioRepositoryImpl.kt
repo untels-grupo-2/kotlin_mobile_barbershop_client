@@ -2,8 +2,8 @@ package com.diamond.appcliente.repository.impl
 
 import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.di.AuthenticatedApi
-import com.diamond.appcliente.dto.servicio.ServicioDto
-import com.diamond.appcliente.dto.servicio.ServicioRequest
+import com.diamond.barbershop.shared.dto.servicio.ServicioDto
+import com.diamond.barbershop.shared.dto.servicio.ServicioRequest
 import com.diamond.appcliente.repository.ServicioRepository
 import javax.inject.Inject
 

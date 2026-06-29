@@ -5,7 +5,7 @@ import com.diamond.appcliente.BuildConfig
 import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.api.AuthInterceptor
 import com.diamond.appcliente.api.TokenManager
-import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.barbershop.shared.util.PreferenciasHelper
 import com.diamond.appcliente.util.SessionManager
 import dagger.Module
 import dagger.Provides

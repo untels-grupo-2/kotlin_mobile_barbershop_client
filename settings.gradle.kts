@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "TA_avance"
 include(":app")
+include(":barbershop_shared")
+project(":barbershop_shared").projectDir = file("../barbershop_shared")

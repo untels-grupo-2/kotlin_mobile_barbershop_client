@@ -16,7 +16,8 @@ class HorarioRangoRepositoryImpl @Inject constructor(
         val response = apiService.obtenerHorariosRangos(tipoHorarioId)
         if (response.isSuccessful && response.body() != null) {
             val body = response.body()!!
-            if (body.status == 200 && body.data != null) return body.data
+            val data = body.data
+            if (body.status == 200 && data != null) return data
             Log.e("HorarioRangoRepository", "Error en datos: ${body.message}")
             throw Exception("Error en los datos de la respuesta")
         }

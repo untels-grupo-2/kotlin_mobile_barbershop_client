@@ -1,25 +1,35 @@
-﻿package com.diamond.appcliente.actividades
+package com.diamond.appcliente.actividades
 
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.view.animation.AnimationUtils
+import android.graphics.PorterDuff
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
-import com.diamond.appcliente.dto.servicio.ServicioDto
+import com.diamond.barbershop.shared.dto.servicio.ServicioDto
 import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
@@ -42,6 +52,7 @@ class ClienteHomeActivity : AuthActivity() {
     private lateinit var clienteFoto: ImageView
     private lateinit var metaProgresoTexto: TextView
     private lateinit var metaProgresoImagen: ImageView
+    private lateinit var progressBarHome: ProgressBar
 
     private var nombreCliente: String? = null
     private var apellidoCliente: String? = null
@@ -54,6 +65,7 @@ class ClienteHomeActivity : AuthActivity() {
         clienteFoto = findViewById(R.id.clienteFoto)
         metaProgresoTexto = findViewById(R.id.metaProgresoTexto)
         metaProgresoImagen = findViewById(R.id.metaProgresoImagen)
+        progressBarHome = findViewById(R.id.progressBarHome)
 
         recyclerView = findViewById(R.id.recyclerViewServicios)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
@@ -84,23 +96,33 @@ class ClienteHomeActivity : AuthActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     usuarioViewModel.usuario.collect { state ->
-                        if (state is UiState.Success) {
-                            val usuario = state.data
-                            nombreCliente = usuario.nombre
-                            apellidoCliente = usuario.apellido
-                            clienteNombre.text = "${usuario.nombre} ${usuario.apellido}"
-                            if (!usuario.urlUsuario.isNullOrEmpty()) {
-                                Glide.with(this@ClienteHomeActivity).load(usuario.urlUsuario).into(clienteFoto)
-                            } else {
+                        when (state) {
+                            is UiState.Success -> {
+                                val usuario = state.data
+                                nombreCliente = usuario.nombre
+                                apellidoCliente = usuario.apellido
+                                clienteNombre.text = "${usuario.nombre} ${usuario.apellido}"
                                 clienteFoto.setImageResource(R.drawable.perfil_default)
+                                if (!usuario.urlUsuario.isNullOrEmpty()) {
+                                    Glide.with(this@ClienteHomeActivity)
+                                        .load(usuario.urlUsuario)
+                                        .skipMemoryCache(true)
+                                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                        .placeholder(R.drawable.perfil_default)
+                                        .error(R.drawable.perfil_default)
+                                        .into(clienteFoto)
+                                }
                             }
+                            else -> {}
                         }
                     }
                 }
                 launch {
                     viewModel1.servicios.collect { state ->
                         when (state) {
+                            is UiState.Loading -> progressBarHome.visibility = View.VISIBLE
                             is UiState.Success -> {
+                                progressBarHome.visibility = View.GONE
                                 if (state.data.isNotEmpty()) {
                                     listaServicios = state.data
                                     adapter = ServicioAdapter(state.data, object : ServicioAdapter.OnServicioClickListener {
@@ -120,7 +142,10 @@ class ClienteHomeActivity : AuthActivity() {
                                     recyclerView.adapter = adapter
                                 }
                             }
-                            is UiState.Error -> Toast.makeText(this@ClienteHomeActivity, state.message, Toast.LENGTH_SHORT).show()
+                            is UiState.Error -> {
+                                progressBarHome.visibility = View.GONE
+                                Toast.makeText(this@ClienteHomeActivity, state.message, Toast.LENGTH_SHORT).show()
+                            }
                             else -> {}
                         }
                     }
@@ -131,6 +156,11 @@ class ClienteHomeActivity : AuthActivity() {
                             var count = state.data.count { it.estRecompensa == 0 }
                             if (count > 7) count = 7
                             updateMetaProgress(count)
+                            val prefs = getSharedPreferences("diamond_prefs", MODE_PRIVATE)
+                            if (!prefs.getBoolean("welcome_shown", false)) {
+                                prefs.edit().putBoolean("welcome_shown", true).apply()
+                                mostrarBienvenidaRacha(count)
+                            }
                         }
                     }
                 }
@@ -146,6 +176,60 @@ class ClienteHomeActivity : AuthActivity() {
         listarReservaViewModel.cargarReservas()
     }
 
+    private fun mostrarBienvenidaRacha(racha: Int) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_bienvenida_racha)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        dialog.setCancelable(true)
+
+        val ivScissors = dialog.findViewById<ImageView>(R.id.ivScissors)
+        val tvNumero = dialog.findViewById<TextView>(R.id.tvRachaNumero)
+        val tvLabel = dialog.findViewById<TextView>(R.id.tvRachaLabel)
+
+        val badgeRes = when (racha) {
+            0 -> R.drawable.ic_racha_1
+            1 -> R.drawable.ic_racha_1
+            2 -> R.drawable.ic_racha_2
+            3 -> R.drawable.ic_racha_3
+            4 -> R.drawable.ic_racha_4
+            5 -> R.drawable.ic_racha_5
+            6 -> R.drawable.ic_racha_6
+            7 -> R.drawable.ic_racha_7
+            8 -> R.drawable.ic_racha_8
+            9 -> R.drawable.ic_racha_9
+            else -> R.drawable.ic_racha_10
+        }
+        ivScissors.setImageResource(badgeRes)
+
+        when {
+            racha == 0 -> {
+                tvNumero.text = "✂"
+                tvLabel.text = "¡EMPIEZA TU RACHA!"
+            }
+            racha >= 10 -> {
+                tvNumero.text = "★"
+                tvLabel.text = "¡META ALCANZADA!"
+            }
+            else -> {
+                tvNumero.text = racha.toString()
+                tvLabel.text = "CORTES EN TU RACHA"
+            }
+        }
+
+        val scissorsAnim = AnimationUtils.loadAnimation(this, R.anim.scissors_pop_in)
+        val numberAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in_up)
+        ivScissors.startAnimation(scissorsAnim)
+        tvNumero.startAnimation(numberAnim)
+
+        dialog.show()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (dialog.isShowing) dialog.dismiss()
+        }, 3000)
+    }
+
     private fun filterServiciosByType(tipo: String): List<ServicioDto> =
         listaServicios.filter { it.nombre_tipoServicio.equals(tipo, ignoreCase = true) }
 
@@ -156,18 +240,32 @@ class ClienteHomeActivity : AuthActivity() {
         }
     }
 
-    private fun updateMetaProgress(reservasRealizadas: Int) {
-        metaProgresoTexto.text = "$reservasRealizadas/7 Cortes"
-        val progresoImagenId = when (reservasRealizadas) {
-            1 -> R.drawable.racha
-            2 -> R.drawable.racha
-            3 -> R.drawable.racha
-            4 -> R.drawable.racha
-            5 -> R.drawable.racha
-            6 -> R.drawable.racha
-            7 -> R.drawable.racha
-            else -> R.drawable.racha
+    private val rachaDotIds = intArrayOf(
+        R.id.rachaDot1, R.id.rachaDot2, R.id.rachaDot3, R.id.rachaDot4,
+        R.id.rachaDot5, R.id.rachaDot6, R.id.rachaDot7
+    )
+
+    private fun updateMetaProgress(count: Int) {
+        metaProgresoTexto.text = "$count/7 Cortes"
+
+        rachaDotIds.forEachIndexed { index, id ->
+            val dot = findViewById<ImageView>(id)
+            dot.setColorFilter(
+                if (index < count) Color.parseColor("#FF9800") else Color.parseColor("#333333"),
+                PorterDuff.Mode.SRC_IN
+            )
         }
-        metaProgresoImagen.setImageResource(progresoImagenId)
+
+        val badgeRes = when (count) {
+            0 -> R.drawable.ic_racha_1
+            1 -> R.drawable.ic_racha_1
+            2 -> R.drawable.ic_racha_2
+            3 -> R.drawable.ic_racha_3
+            4 -> R.drawable.ic_racha_4
+            5 -> R.drawable.ic_racha_5
+            6 -> R.drawable.ic_racha_6
+            else -> R.drawable.ic_racha_7
+        }
+        metaProgresoImagen.setImageResource(badgeRes)
     }
 }

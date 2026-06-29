@@ -2,7 +2,7 @@ package com.diamond.appcliente.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diamond.appcliente.dto.barbero.BarberoDto
+import com.diamond.barbershop.shared.dto.barbero.BarberoDto
 import com.diamond.appcliente.repository.BarberoRepository
 import com.diamond.appcliente.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel

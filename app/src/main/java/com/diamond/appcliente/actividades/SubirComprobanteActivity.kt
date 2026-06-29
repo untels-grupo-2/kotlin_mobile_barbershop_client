@@ -119,7 +119,9 @@ class SubirComprobanteActivity : AuthActivity() {
     private fun mostrarVistaPrevia(imagenUri: Uri) {
         try {
             imagePreview.setImageBitmap(BitmapFactory.decodeStream(contentResolver.openInputStream(imagenUri)))
+            imagePreview.alpha = 1f
             imagePreview.visibility = View.VISIBLE
+            findViewById<android.widget.TextView>(R.id.tvPlaceholder).visibility = View.GONE
         } catch (e: IOException) {
             Log.e("SubirComprobanteActivity", "Error al mostrar la vista previa de la imagen", e)
         }

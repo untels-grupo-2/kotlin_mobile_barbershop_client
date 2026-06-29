@@ -1,79 +1,85 @@
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="160dp"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="10dp"
-    app:cardCornerRadius="15dp"
-    app:cardElevation="45dp"
-    android:backgroundTint="#212121">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="#1E1E1E"
+    app:strokeColor="#FF9800"
+    app:strokeWidth="1dp">
 
-<LinearLayout
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <!-- Imagen del servicio con bordes redondeados -->
-<ImageView
-android:id="@+id/imageServicio"
-android:layout_width="124dp"
-android:layout_height="170dp"
-android:layout_marginTop="20dp"
-android:layout_marginBottom="8dp"
-android:background="@drawable/rounded_border"
-android:clipToOutline="true"
-android:scaleType="centerCrop"
-android:src="@drawable/barberia1" />
+        <ImageView
+            android:id="@+id/imageServicio"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/barberia1" />
 
-<TextView
-android:id="@+id/textNombreServicio"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="High Fade"
-android:textColor="#fff"
-android:textSize="18sp"
-android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-<TextView
-android:id="@+id/textPrecioServicio"
-android:layout_width="78dp"
-android:layout_height="wrap_content"
-android:layout_marginEnd="100dp"
-android:gravity="start"
-android:text="S/ 25.0"
-android:textColor="#FFC107"
-android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textNombreServicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/oswald_font"
+                android:text="High Fade"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
-    <!-- Descripción del servicio con límite de líneas -->
-<TextView
-android:id="@+id/textDescripcionServicio"
-android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:maxLines="3"
-    android:ellipsize="end"
-    android:gravity="start"
-    android:text="Descripción del servicio. Este es un servicio de corte de cabello..."
-    android:textColor="#fff"
-    android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textPrecioServicio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="#FF9800"
+                android:fontFamily="@font/oswald_font"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="S/ 25.0"
+                android:textColor="#000000"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-    <!-- Espacio flexible para que el botón quede al fondo -->
-<LinearLayout
-android:layout_width="match_parent"
-android:layout_height="0dp"
-android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/textDescripcionServicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:fontFamily="@font/oswald_font"
+                android:text="Descripción del servicio"
+                android:textColor="#AAAAAA"
+                android:textSize="12sp" />
 
-    <!-- Botón de Reservar con margen inferior -->
-<Button
-android:id="@+id/btnAviso"
-android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_marginBottom="1dp"
-    android:backgroundTint="#FF9800"
-    android:padding="10dp"
-    android:text="Reservar"
-    android:textColor="#000000"
-    android:textStyle="bold" />
-
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAviso"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#FF9800"
+                android:fontFamily="@font/oswald_font"
+                android:text="Reservar"
+                android:textColor="#000000"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:cornerRadius="8dp" />
+        </LinearLayout>
     </LinearLayout>
-    </androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

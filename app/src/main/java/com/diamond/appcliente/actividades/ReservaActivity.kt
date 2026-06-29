@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.reserva.DtoReserva
+import com.google.android.material.appbar.MaterialToolbar
 import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarReservaViewModel
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
@@ -55,6 +56,7 @@ class ReservaActivity : AuthActivity() {
         editTextAdicionales = findViewById(R.id.editTextAdicionales)
         btnEnviarReserva = findViewById(R.id.btnEnviarReserva)
         btnEnviarReservaRecompensa = findViewById(R.id.btnEnviarReservaRecompensa)
+        findViewById<MaterialToolbar>(R.id.toolbar).setNavigationOnClickListener { finish() }
 
         val barbero = intent.getStringExtra("barbero")
         val horario = intent.getStringExtra("horario")
@@ -67,9 +69,9 @@ class ReservaActivity : AuthActivity() {
 
         Log.d("ReservaActivity", "Servicio ID: $servicio_id | HorarioRangoId: $horarioRangoId | BarberoId: $barberoId")
 
-        textViewBarbero.text = "Barbero: $barbero"
-        textViewHorario.text = "Turno: $horario"
-        textViewServicio.text = "Servicio: $servicio"
+        textViewBarbero.text = barbero ?: ""
+        textViewHorario.text = horario ?: ""
+        textViewServicio.text = servicio ?: ""
 
         textViewFecha.text = if (!fecha.isNullOrEmpty()) fecha
         else "Fecha: ${SimpleDateFormat("yyyy-MM-dd").format(Date())}"

@@ -76,4 +76,9 @@ class ListarReservaActivity : AuthActivity() {
 
         listarReservaViewModel.cargarReservas()
     }
+
+    override fun onResume() {
+        super.onResume()
+        listarReservaViewModel.cargarReservas()
+    }
 }

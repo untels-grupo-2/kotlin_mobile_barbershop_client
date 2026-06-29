@@ -87,4 +87,5 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.fragment.ktx)
+    implementation(project(":barbershop_shared"))
 }

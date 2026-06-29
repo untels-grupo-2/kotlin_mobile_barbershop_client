@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.BarberoAdapter
-import com.diamond.appcliente.dto.barbero.BarberoDto
+import com.diamond.barbershop.shared.dto.barbero.BarberoDto
 import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarBarberoViewModel
 import dagger.hilt.android.AndroidEntryPoint

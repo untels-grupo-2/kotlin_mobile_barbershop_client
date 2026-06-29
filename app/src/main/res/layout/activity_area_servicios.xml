@@ -78,12 +78,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:background="@drawable/border_titulo_servicios"
+                    android:fontFamily="@font/oswald_font"
                     android:gravity="center"
-                    android:padding="8dp"
-                    android:text="Nuestros Servicios"
-                    android:textColor="#FFD700"
-                    android:textSize="20sp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:text="— NUESTROS SERVICIOS —"
+                    android:textColor="#FF9800"
+                    android:textSize="17sp"
+                    android:letterSpacing="0.1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/subTitulo" />
@@ -100,51 +104,76 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp">
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/serviciosButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="16dp"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
                             android:backgroundTint="#FF9800"
+                            android:fontFamily="@font/oswald_font"
                             android:text="Todos"
-                            android:textColor="#000000" />
+                            android:textColor="#000000"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp" />
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/cortesButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="16dp"
-                            android:backgroundTint="#FF9800"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#2A2A2A"
+                            android:fontFamily="@font/oswald_font"
                             android:text="Cortes"
-                            android:textColor="#000000" />
+                            android:textColor="#FF9800"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="#FF9800"
+                            app:strokeWidth="1dp" />
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/SkincareButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="16dp"
-                            android:backgroundTint="#FF9800"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#2A2A2A"
+                            android:fontFamily="@font/oswald_font"
                             android:text="Skincare"
-                            android:textColor="#000000" />
+                            android:textColor="#FF9800"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="#FF9800"
+                            app:strokeWidth="1dp" />
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/AfeitadoButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="#FF9800"
-                            android:layout_marginEnd="16dp"
-                            android:text="Afeitado de Barba"
-                            android:textColor="#000000" />
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#2A2A2A"
+                            android:fontFamily="@font/oswald_font"
+                            android:text="Afeitado"
+                            android:textColor="#FF9800"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="#FF9800"
+                            app:strokeWidth="1dp" />
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/ColoracionButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="#FF9800"
+                            android:layout_height="36dp"
+                            android:backgroundTint="#2A2A2A"
+                            android:fontFamily="@font/oswald_font"
                             android:text="Coloración"
-                            android:textColor="#000000" />
+                            android:textColor="#FF9800"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="#FF9800"
+                            app:strokeWidth="1dp" />
                     </LinearLayout>
                 </HorizontalScrollView>
 
@@ -167,15 +196,29 @@
             android:id="@+id/bottomNavigationView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#333333"
+            android:background="@drawable/bg_bottom_nav"
+            android:elevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:itemIconTint="@drawable/color_state_list"
-            app:itemTextColor="@color/white"
+            app:itemTextColor="@drawable/color_state_list"
             app:menu="@menu/bottom_nav_menu"
             app:itemBackground="@drawable/no_ripple_background"
             app:itemRippleColor="@android:color/transparent"/>
+
+        <ProgressBar
+            android:id="@+id/progressBarServicios"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateTint="#FF9800"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

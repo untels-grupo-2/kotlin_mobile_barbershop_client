@@ -1,7 +1,7 @@
 package com.diamond.appcliente.repository
 
-import com.diamond.appcliente.dto.servicio.ServicioDto
-import com.diamond.appcliente.dto.servicio.ServicioRequest
+import com.diamond.barbershop.shared.dto.servicio.ServicioDto
+import com.diamond.barbershop.shared.dto.servicio.ServicioRequest
 
 interface ServicioRepository {
     suspend fun listarServicios(): List<ServicioDto>

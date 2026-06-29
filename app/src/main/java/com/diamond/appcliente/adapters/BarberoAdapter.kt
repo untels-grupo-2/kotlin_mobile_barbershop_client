@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
-import com.diamond.appcliente.dto.barbero.BarberoDto
+import com.diamond.barbershop.shared.dto.barbero.BarberoDto
 
 class BarberoAdapter(
     private val barberos: List<BarberoDto>,

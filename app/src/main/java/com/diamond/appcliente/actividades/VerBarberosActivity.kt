@@ -5,12 +5,15 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.appbar.MaterialToolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -28,6 +31,7 @@ import kotlinx.coroutines.launch
 class VerBarberosActivity : AuthActivity() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBarBarberos: ProgressBar
     private var adapter: BarberoDisponibleAdapter? = null
     private val viewModel: HorarioBarberoInstanciaViewModel by viewModels()
 
@@ -48,6 +52,8 @@ class VerBarberosActivity : AuthActivity() {
         setContentView(R.layout.activity_ver_barberos)
 
         recyclerView = findViewById(R.id.recyclerViewBarberos)
+        progressBarBarberos = findViewById(R.id.progressBarBarberos)
+        findViewById<MaterialToolbar>(R.id.toolbar).setNavigationOnClickListener { finish() }
         nombreServicio = intent.getStringExtra("nombreServicio")
         descripcionServicio = intent.getStringExtra("descripcionServicio")
         precioServicio = intent.getDoubleExtra("precioServicio", 0.0)
@@ -79,7 +85,9 @@ class VerBarberosActivity : AuthActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.barberosDisponibles.collect { state ->
                     when (state) {
+                        is UiState.Loading -> progressBarBarberos.visibility = View.VISIBLE
                         is UiState.Success -> {
+                            progressBarBarberos.visibility = View.GONE
                             if (state.data.isNotEmpty()) {
                                 adapter = BarberoDisponibleAdapter(state.data, this@VerBarberosActivity)
                                 recyclerView.adapter = adapter
@@ -87,7 +95,10 @@ class VerBarberosActivity : AuthActivity() {
                                 Toast.makeText(this@VerBarberosActivity, "No hay barberos disponibles para esta fecha y horario", Toast.LENGTH_SHORT).show()
                             }
                         }
-                        is UiState.Error -> Toast.makeText(this@VerBarberosActivity, state.message, Toast.LENGTH_SHORT).show()
+                        is UiState.Error -> {
+                            progressBarBarberos.visibility = View.GONE
+                            Toast.makeText(this@VerBarberosActivity, state.message, Toast.LENGTH_SHORT).show()
+                        }
                         else -> {}
                     }
                 }

@@ -1,6 +1,6 @@
 package com.diamond.appcliente.repository
 
-import com.diamond.appcliente.dto.barbero.BarberoDto
+import com.diamond.barbershop.shared.dto.barbero.BarberoDto
 import com.diamond.appcliente.dto.barbero.DtoBarberoDisponible
 
 interface BarberoRepository {

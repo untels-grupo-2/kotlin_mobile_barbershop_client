@@ -5,7 +5,9 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -17,9 +19,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.auth0.android.jwt.JWT
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
-import com.diamond.appcliente.dto.servicio.ServicioDto
+import com.diamond.barbershop.shared.dto.servicio.ServicioDto
 import com.diamond.appcliente.ui.state.UiState
-import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.barbershop.shared.util.PreferenciasHelper
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +34,7 @@ class SeccionServiciosActivity : AuthActivity() {
     @Inject lateinit var preferenciasHelper: PreferenciasHelper
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBarServicios: ProgressBar
     private var adapter: ServicioAdapter? = null
     private var listaServicios: List<ServicioDto> = emptyList()
     private val viewModel1: GestionarServicioViewModel by viewModels()
@@ -49,6 +52,7 @@ class SeccionServiciosActivity : AuthActivity() {
         apellidoCliente = jwt.getClaim("apellido").asString()
 
         recyclerView = findViewById(R.id.recyclerViewServicios)
+        progressBarServicios = findViewById(R.id.progressBarServicios)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -78,7 +82,9 @@ class SeccionServiciosActivity : AuthActivity() {
                 launch {
                     viewModel1.servicios.collect { state ->
                         when (state) {
+                            is UiState.Loading -> progressBarServicios.visibility = View.VISIBLE
                             is UiState.Success -> {
+                                progressBarServicios.visibility = View.GONE
                                 if (state.data.isNotEmpty()) {
                                     listaServicios = state.data
                                     adapter = ServicioAdapter(state.data, object : ServicioAdapter.OnServicioClickListener {
@@ -98,7 +104,10 @@ class SeccionServiciosActivity : AuthActivity() {
                                     recyclerView.adapter = adapter
                                 }
                             }
-                            is UiState.Error -> Toast.makeText(this@SeccionServiciosActivity, state.message, Toast.LENGTH_SHORT).show()
+                            is UiState.Error -> {
+                                progressBarServicios.visibility = View.GONE
+                                Toast.makeText(this@SeccionServiciosActivity, state.message, Toast.LENGTH_SHORT).show()
+                            }
                             else -> {}
                         }
                     }

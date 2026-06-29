@@ -8,7 +8,8 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -27,7 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var campoContraseña: EditText
     private lateinit var btnIngresarApp: Button
     private lateinit var btnOlvideContrasena: Button
-    private lateinit var progressLogin: ProgressBar
+    private lateinit var loadingOverlay: FrameLayout
+    private lateinit var ivDiamondLoading: ImageView
     private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +40,8 @@ class MainActivity : AppCompatActivity() {
         campoContraseña = findViewById(R.id.campoContraseña)
         btnIngresarApp = findViewById(R.id.btnIngresarApp)
         btnOlvideContrasena = findViewById(R.id.btnOlvideContrasena)
-        progressLogin = findViewById(R.id.progressLogin)
+        loadingOverlay = findViewById(R.id.loadingOverlay)
+        ivDiamondLoading = findViewById(R.id.ivDiamondLoading)
 
         val shakeAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
 
@@ -84,12 +87,10 @@ class MainActivity : AppCompatActivity() {
                     when (result) {
                         is MainViewModel.LoginResult.Loading -> {
                             Log.d("MainActivity", "Login en progreso...")
-                            progressLogin.visibility = View.VISIBLE
-                            btnIngresarApp.isEnabled = false
+                            showDiamondLoading()
                         }
                         is MainViewModel.LoginResult.Success -> {
-                            progressLogin.visibility = View.GONE
-                            btnIngresarApp.isEnabled = true
+                            hideDiamondLoading()
                             val intent = Intent(this@MainActivity, ClienteHomeActivity::class.java)
                             intent.putExtra("nombre", result.nombre)
                             intent.putExtra("apellido", result.apellido)
@@ -98,8 +99,7 @@ class MainActivity : AppCompatActivity() {
                             finish()
                         }
                         is MainViewModel.LoginResult.Error -> {
-                            progressLogin.visibility = View.GONE
-                            btnIngresarApp.isEnabled = true
+                            hideDiamondLoading()
                             Log.e("MainActivity", "Error de login: ${result.message}")
                             when (result.message) {
                                 "NO_USER" -> Toast.makeText(this@MainActivity, "Rol no autorizado", Toast.LENGTH_SHORT).show()
@@ -112,5 +112,18 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun showDiamondLoading() {
+        val spinAnim = AnimationUtils.loadAnimation(this, R.anim.rotate_diamond)
+        ivDiamondLoading.startAnimation(spinAnim)
+        loadingOverlay.visibility = View.VISIBLE
+        btnIngresarApp.isEnabled = false
+    }
+
+    private fun hideDiamondLoading() {
+        ivDiamondLoading.clearAnimation()
+        loadingOverlay.visibility = View.GONE
+        btnIngresarApp.isEnabled = true
     }
 }

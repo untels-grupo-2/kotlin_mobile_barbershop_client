@@ -1,10 +1,9 @@
-﻿package com.diamond.appcliente.actividades
+package com.diamond.appcliente.actividades
 
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -12,8 +11,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
-import com.diamond.appcliente.dto.servicio.ServicioRequest
+import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
+import com.diamond.barbershop.shared.dto.servicio.ServicioDto
+import com.diamond.barbershop.shared.dto.servicio.ServicioRequest
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -36,15 +37,23 @@ class GestionarServicioActivity : AuthActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.servicios.collect { servicios ->
-                        if (servicios.isEmpty()) return@collect
-                        if (adapter == null) {
-                            adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
-                                override fun onAviso(servicio: com.diamond.appcliente.dto.servicio.ServicioDto, imagenUrl: String?) {}
-                            })
-                            recyclerView.adapter = adapter
-                        } else {
-                            adapter!!.notifyDataSetChanged()
+                    viewModel.servicios.collect { state ->
+                        when (state) {
+                            is UiState.Success -> {
+                                val servicios = state.data
+                                if (adapter == null) {
+                                    adapter = ServicioAdapter(servicios, object : ServicioAdapter.OnServicioClickListener {
+                                        override fun onAviso(servicio: ServicioDto, imagenUrl: String?) {}
+                                    })
+                                    recyclerView.adapter = adapter
+                                } else {
+                                    adapter!!.notifyDataSetChanged()
+                                }
+                            }
+                            is UiState.Error -> Toast.makeText(
+                                this@GestionarServicioActivity, state.message, Toast.LENGTH_SHORT
+                            ).show()
+                            else -> {}
                         }
                     }
                 }
@@ -54,7 +63,7 @@ class GestionarServicioActivity : AuthActivity() {
                     }
                 }
                 launch {
-                    viewModel.error.collect { msg ->
+                    viewModel.crudError.collect { msg ->
                         Toast.makeText(this@GestionarServicioActivity, "Error: $msg", Toast.LENGTH_SHORT).show()
                     }
                 }

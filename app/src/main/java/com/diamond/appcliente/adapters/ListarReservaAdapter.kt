@@ -31,13 +31,12 @@ class ListarReservaAdapter : ListAdapter<ReservaResponse, ListarReservaAdapter.L
         holder.fechaReserva.text = "Fecha: ${reserva.fechaReserva}"
 
         val context = holder.itemView.context
-        if (reserva.estado == "REALIZADA") {
-            holder.btnSubirComprobante.isEnabled = false
-            holder.btnSubirComprobante.setBackgroundColor(context.resources.getColor(R.color.gray))
-        } else {
-            holder.btnSubirComprobante.isEnabled = true
-            holder.btnSubirComprobante.setBackgroundColor(context.resources.getColor(R.color.custom_orange))
-        }
+        val bloqueado = reserva.estado == "REALIZADA" || !reserva.urlPago.isNullOrEmpty()
+        holder.btnSubirComprobante.isEnabled = !bloqueado
+        holder.btnSubirComprobante.backgroundTintList = context.resources.getColorStateList(
+            if (bloqueado) R.color.gray else R.color.custom_orange, null
+        )
+        holder.btnSubirComprobante.text = if (!reserva.urlPago.isNullOrEmpty()) "Subido ✓" else "Subir Comprobante"
 
         holder.whatsappIcon.setOnClickListener {
             val mensaje = "Hola, me gustaría consultar acerca de mi reserva para el servicio de " +

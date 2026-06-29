@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.valoracion.ValoracionRequest
+import com.google.android.material.appbar.MaterialToolbar
 import com.diamond.appcliente.viewmodel.GestionarValoracionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -39,9 +40,25 @@ class ValoracionActivity : AuthActivity() {
         radioGroupValoracion = findViewById(R.id.radioGroupValoracion)
         radioGroupFacilidad = findViewById(R.id.radioGroupFacilidad)
         editTextComentario = findViewById(R.id.editTextComentario)
+        findViewById<MaterialToolbar>(R.id.toolbar).setNavigationOnClickListener { finish() }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = Color.BLACK
+        }
+
+        val ratingButtons = listOf(R.id.radio1, R.id.radio2, R.id.radio3, R.id.radio4, R.id.radio5)
+            .map { findViewById<RadioButton>(it) }
+        radioGroupValoracion.setOnCheckedChangeListener { _, checkedId ->
+            ratingButtons.forEach { rb ->
+                rb.setTextColor(if (rb.id == checkedId) Color.parseColor("#000000") else Color.parseColor("#FF9800"))
+            }
+        }
+
+        val facilidadButtons = listOf(R.id.radioSi, R.id.radioNo).map { findViewById<RadioButton>(it) }
+        radioGroupFacilidad.setOnCheckedChangeListener { _, checkedId ->
+            facilidadButtons.forEach { rb ->
+                rb.setTextColor(if (rb.id == checkedId) Color.parseColor("#000000") else Color.parseColor("#FF9800"))
+            }
         }
 
         findViewById<Button>(R.id.btnCancelar).setOnClickListener {

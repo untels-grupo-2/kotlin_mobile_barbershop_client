@@ -1,6 +1,7 @@
 package com.diamond.appcliente.adapters
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.barbero.DtoBarberoDisponible
+import com.google.android.material.card.MaterialCardView
 
 class BarberoDisponibleAdapter(
     private val barberos: List<DtoBarberoDisponible>,
@@ -30,29 +32,55 @@ class BarberoDisponibleAdapter(
     override fun onBindViewHolder(holder: BarberoViewHolder, position: Int) {
         val barbero = barberos[position]
         holder.nombreTextView.text = barbero.nombre
-        Glide.with(context).load(barbero.urlBarbero).into(holder.imagenBarbero)
+        Glide.with(context).load(barbero.urlBarbero)
+            .placeholder(R.drawable.perfil_default)
+            .error(R.drawable.perfil_default)
+            .into(holder.imagenBarbero)
+
+        val isSelected = position == selectedPosition
 
         if (barbero.disponible) {
             holder.radioButton.isEnabled = true
-            holder.itemView.setBackgroundColor(context.resources.getColor(R.color.black))
+            holder.radioButton.isChecked = isSelected
             holder.imagenBarbero.colorFilter = null
+            holder.textViewDisponibilidad.visibility = View.GONE
+
+            holder.cardView.setCardBackgroundColor(
+                if (isSelected) Color.parseColor("#251800") else Color.parseColor("#1E1E1E")
+            )
+            holder.cardView.strokeColor =
+                if (isSelected) Color.parseColor("#FF9800") else Color.parseColor("#333333")
         } else {
             holder.radioButton.isEnabled = false
             holder.radioButton.isChecked = false
-            holder.itemView.setBackgroundColor(context.resources.getColor(R.color.gray))
-            val colorMatrix = ColorMatrix().apply { setSaturation(0f) }
-            holder.imagenBarbero.colorFilter = ColorMatrixColorFilter(colorMatrix)
+            holder.imagenBarbero.colorFilter = ColorMatrixColorFilter(
+                ColorMatrix().apply { setSaturation(0f) }
+            )
+            holder.textViewDisponibilidad.visibility = View.VISIBLE
+            holder.cardView.setCardBackgroundColor(Color.parseColor("#141414"))
+            holder.cardView.strokeColor = Color.parseColor("#222222")
         }
 
-        holder.radioButton.isChecked = position == selectedPosition
-
-        holder.radioButton.setOnClickListener {
+        // Todo el card es clickeable para seleccionar
+        holder.cardView.setOnClickListener {
             if (barbero.disponible) {
-                selectedPosition = position
-                notifyDataSetChanged()
+                val prev = selectedPosition
+                selectedPosition = holder.adapterPosition
+                notifyItemChanged(prev)
+                notifyItemChanged(selectedPosition)
                 Toast.makeText(context, "Seleccionaste a ${barbero.nombre}", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "${barbero.nombre} no está disponible", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        holder.radioButton.setOnClickListener {
+            if (barbero.disponible) {
+                val prev = selectedPosition
+                selectedPosition = holder.adapterPosition
+                notifyItemChanged(prev)
+                notifyItemChanged(selectedPosition)
+                Toast.makeText(context, "Seleccionaste a ${barbero.nombre}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -63,8 +91,10 @@ class BarberoDisponibleAdapter(
         if (selectedPosition >= 0) barberos[selectedPosition] else null
 
     inner class BarberoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val cardView: MaterialCardView = itemView as MaterialCardView
         val nombreTextView: TextView = itemView.findViewById(R.id.nombreBarbero)
         val radioButton: RadioButton = itemView.findViewById(R.id.radioButton)
         val imagenBarbero: ImageView = itemView.findViewById(R.id.imagenBarbero)
+        val textViewDisponibilidad: TextView = itemView.findViewById(R.id.textViewDisponibilidad)
     }
 }

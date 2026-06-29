@@ -1,8 +1,8 @@
 package com.diamond.appcliente.api
 
 import com.diamond.appcliente.di.UnauthenticatedApi
-import com.diamond.appcliente.dto.refresh.RefreshRequest
-import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.barbershop.shared.dto.refresh.RefreshRequest
+import com.diamond.barbershop.shared.util.PreferenciasHelper
 import javax.inject.Inject
 
 class TokenManager @Inject constructor(

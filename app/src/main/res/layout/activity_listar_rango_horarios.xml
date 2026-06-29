@@ -10,21 +10,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Toolbar -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
-            android:background="#121212"
-            android:title="Reserva"
-            android:titleTextColor="#FFFFFF"
+            android:background="#1A1A1A"
+            android:title="Seleccionar Horario"
+            android:titleTextColor="#FF9800"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:navigationIconTint="#FFFFFF" />
+            app:navigationIconTint="#FF9800"
+            app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
 
-        <!-- Scroll content -->
         <androidx.core.widget.NestedScrollView
             android:id="@+id/scrollView"
             android:layout_width="0dp"
@@ -43,97 +42,104 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Fecha -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="Selecciona una fecha"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp" />
+                    android:fontFamily="@font/oswald_font"
+                    android:text="SELECCIONA UNA FECHA"
+                    android:textColor="#FF9800"
+                    android:textSize="16sp" />
 
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:background="#222222"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
+                    android:layout_marginBottom="20dp"
+                    app:cardBackgroundColor="#1E1E1E"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="#FF9800"
+                    app:strokeWidth="1dp">
 
-                    <TextView
-                        android:id="@+id/textFechaSeleccionada"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Selecciona una fecha"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
-
-                    <ImageView
-                        android:id="@+id/btnSeleccionarFecha"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_calendar"
-                        app:tint="#FF9800" />
-                </LinearLayout>
-
-                <!-- Turnos disponibles -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="Horarios disponibles"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp" />
-
-                <!-- Turno mañana -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="8dp">>
-
-                    <!-- RecyclerView para todos los turnos -->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerViewHorarios"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center" />
-                </LinearLayout>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
-                <!-- Botones -->
-                <Button
+                        <TextView
+                            android:id="@+id/textFechaSeleccionada"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/oswald_font"
+                            android:text="Selecciona una fecha"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:id="@+id/btnSeleccionarFecha"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="#FF9800" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:fontFamily="@font/oswald_font"
+                    android:text="HORARIOS DISPONIBLES"
+                    android:textColor="#FF9800"
+                    android:textSize="16sp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewHorarios"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnConfirmarFechayHora"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_height="52dp"
+                    android:layout_marginBottom="12dp"
                     android:backgroundTint="#FF9800"
-                    android:text="Siguiente"
-                    android:textColor="#FFFFFF" />
+                    android:fontFamily="@font/oswald_font"
+                    android:text="SIGUIENTE"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    app:cornerRadius="12dp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCancelarReserva"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:backgroundTint="#333333"
-                    android:text="Cancelar"
-                    android:textColor="#FF9800" />
+                    android:layout_height="50dp"
+                    android:backgroundTint="#1E1E1E"
+                    android:fontFamily="@font/oswald_font"
+                    android:text="CANCELAR"
+                    android:textColor="#FF9800"
+                    android:textSize="16sp"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="#333333"
+                    app:strokeWidth="1dp" />
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
 
-        <!-- Bottom Navigation -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#333333"
+            android:background="@drawable/bg_bottom_nav"
+            android:elevation="8dp"
             app:itemBackground="@drawable/no_ripple_background"
             app:itemIconTint="@drawable/color_state_list"
-            app:itemTextColor="@color/white"
+            app:itemTextColor="@drawable/color_state_list"
+            app:itemRippleColor="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

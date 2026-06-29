@@ -24,7 +24,7 @@ import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.dto.usuario.UsuarioDto
 import com.diamond.appcliente.ui.state.UiState
-import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.barbershop.shared.util.PreferenciasHelper
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -47,6 +47,9 @@ class UsuarioActivity : AuthActivity() {
     private val viewModel: UsuarioViewModel by viewModels()
     private val listarReservaViewModel: ListarReservaViewModel by viewModels()
     private var imagenSeleccionadaUri: Uri? = null
+    private var tvImagenSeleccionadaRef: TextView? = null
+    private var layoutImagenSeleccionadaRef: android.view.View? = null
+    private var btnSeleccionarImagenRef: android.widget.Button? = null
 
     @Inject lateinit var preferenciasHelper: PreferenciasHelper
 
@@ -161,7 +164,11 @@ class UsuarioActivity : AuthActivity() {
             }
         }
 
-        popupView.findViewById<Button>(R.id.btnSeleccionarImagenUsuario).setOnClickListener { seleccionarImagen() }
+        val btnSeleccionarImagen = popupView.findViewById<Button>(R.id.btnSeleccionarImagenUsuario)
+        btnSeleccionarImagenRef = btnSeleccionarImagen
+        tvImagenSeleccionadaRef = popupView.findViewById(R.id.tvImagenSeleccionada)
+        layoutImagenSeleccionadaRef = popupView.findViewById(R.id.layoutImagenSeleccionada)
+        btnSeleccionarImagen.setOnClickListener { seleccionarImagen() }
 
         popupView.findViewById<Button>(R.id.btnActualizarUsuario).setOnClickListener {
             val nombre = editTextNombre.text.toString()
@@ -188,6 +195,11 @@ class UsuarioActivity : AuthActivity() {
             startActivity(Intent(this, UsuarioActivity::class.java))
         }
 
+        popupWindow.setOnDismissListener {
+            tvImagenSeleccionadaRef = null
+            layoutImagenSeleccionadaRef = null
+            btnSeleccionarImagenRef = null
+        }
         popupWindow.showAtLocation(findViewById(R.id.activity_usuario), Gravity.CENTER, 0, 0)
     }
 
@@ -199,11 +211,19 @@ class UsuarioActivity : AuthActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == 1) {
-            imagenSeleccionadaUri = data?.data
+            val uri = data?.data
+            imagenSeleccionadaUri = uri
+            if (uri != null) {
+                val fileName = uri.lastPathSegment?.substringAfterLast("/") ?: uri.toString().substringAfterLast("/")
+                tvImagenSeleccionadaRef?.text = fileName
+                layoutImagenSeleccionadaRef?.visibility = android.view.View.VISIBLE
+                btnSeleccionarImagenRef?.text = "CAMBIAR IMAGEN"
+            }
         }
     }
 
     private fun cerrarSesion() {
+        getSharedPreferences("diamond_prefs", MODE_PRIVATE).edit().putBoolean("welcome_shown", false).apply()
         preferenciasHelper.limpiarPreferencias()
         Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, MainActivity::class.java)

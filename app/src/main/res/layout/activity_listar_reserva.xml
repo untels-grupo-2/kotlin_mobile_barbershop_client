@@ -14,9 +14,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="16dp"
+        android:fontFamily="@font/oswald_font"
         android:text="MIS RESERVAS"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
+        android:textColor="#FF9800"
+        android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/recycler_view_reservas"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,14 +27,15 @@
     <!-- ProgressBar para indicar la carga de datos -->
     <ProgressBar
         android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:indeterminateTint="#FF9800"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:indeterminate="true" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- RecyclerView que contendrá las reservas -->
     <androidx.recyclerview.widget.RecyclerView
@@ -50,12 +52,13 @@
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#333333"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:itemIconTint="@drawable/color_state_list"
-        app:itemTextColor="@color/white"
+        app:itemTextColor="@drawable/color_state_list"
         app:menu="@menu/bottom_nav_menu"
         app:itemBackground="@drawable/no_ripple_background"
         app:itemRippleColor="@android:color/transparent" />

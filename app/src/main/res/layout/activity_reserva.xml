@@ -1,127 +1,331 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121212">
 
-    <!-- ScrollView para hacer que la interfaz sea desplazable -->
-    <android.widget.ScrollView
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1A1A1A"
+        app:elevation="4dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#1A1A1A"
+            android:title="REALIZAR RESERVA"
+            android:titleTextColor="#FF9800"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+            app:navigationIconTint="#FF9800"
+            app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:paddingBottom="24dp"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:layout_gravity="center">
+            android:padding="16dp">
 
-            <!-- Título de la ventana emergente -->
-            <TextView
-                android:id="@+id/textViewTitle"
+            <!-- Decorative scissors header -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Realiza tu Reserva"
-                android:textColor="#FF9800"
-                android:textSize="24sp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#FF9800" />
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/ic_scissors"
+                    app:tint="#FF9800" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#FF9800" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CONFIRMA TU CITA"
+                android:textColor="#CCCCCC"
+                android:fontFamily="@font/oswald_font"
+                android:textSize="14sp"
                 android:gravity="center"
-                android:textStyle="bold"
-                android:layout_marginTop="32dp"
-            android:layout_marginBottom="24dp" />
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="20dp" />
 
-            <!-- TextView para mostrar el barbero seleccionado -->
-            <TextView
-                android:id="@+id/textViewBarbero"
+            <!-- Details card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Barbero:"
-                android:textColor="#FF9800"
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <!-- TextView para mostrar el horario seleccionado -->
-            <TextView
-                android:id="@+id/textViewHorario"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Horario:"
-                android:textColor="#FF9800"
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <!-- TextView para mostrar el servicio seleccionado -->
-            <TextView
-                android:id="@+id/textViewServicio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Servicio:"
-                android:textColor="#FF9800"
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp" />
-
-            <!-- TextView para mostrar la fecha seleccionada -->
-            <TextView
-                android:id="@+id/textViewFecha"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Fecha de la reserva"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/rounded_edittext"
-                android:textColorHint="#FF9800"
-                android:gravity="center"
                 android:layout_marginBottom="16dp"
-                android:textSize="16sp"/>
+                app:cardBackgroundColor="#1E1E1E"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                app:strokeColor="#FF9800"
+                app:strokeWidth="1dp">
 
-            <!-- Campo para comentarios adicionales con borde redondeado -->
-            <EditText
-                android:id="@+id/editTextAdicionales"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Barbero row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_profile"
+                            app:tint="#FF9800" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="BARBERO"
+                                android:textColor="#888888"
+                                android:fontFamily="@font/oswald_font"
+                                android:textSize="11sp"
+                                android:letterSpacing="0.12" />
+
+                            <TextView
+                                android:id="@+id/textViewBarbero"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#FFFFFF"
+                                android:fontFamily="@font/oswald_font"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#2A2A2A" />
+
+                    <!-- Turno row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_clock"
+                            app:tint="#FF9800" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="TURNO"
+                                android:textColor="#888888"
+                                android:fontFamily="@font/oswald_font"
+                                android:textSize="11sp"
+                                android:letterSpacing="0.12" />
+
+                            <TextView
+                                android:id="@+id/textViewHorario"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#FFFFFF"
+                                android:fontFamily="@font/oswald_font"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#2A2A2A" />
+
+                    <!-- Servicio row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_scissors"
+                            app:tint="#FF9800" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="SERVICIO"
+                                android:textColor="#888888"
+                                android:fontFamily="@font/oswald_font"
+                                android:textSize="11sp"
+                                android:letterSpacing="0.12" />
+
+                            <TextView
+                                android:id="@+id/textViewServicio"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#FFFFFF"
+                                android:fontFamily="@font/oswald_font"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#2A2A2A" />
+
+                    <!-- Fecha (centered, orange badge) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="#FF9800"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/textViewFecha"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="#FF9800"
+                            android:fontFamily="@font/oswald_font"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Comment input -->
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Comentarios adicionales"
-                android:textColor="#FFFFFF"
-                android:background="#333333"
-                android:padding="12dp"
-                android:textColorHint="#FF9800"
-                android:inputType="text"
-                android:layout_marginBottom="32dp"/>
+                android:layout_marginBottom="24dp"
+                android:hint="Comentarios adicionales (opcional)"
+                app:boxBackgroundColor="#1E1E1E"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="#FF9800"
+                app:hintTextColor="#888888"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-            <!-- Botón para enviar la reserva con color de fondo y borde redondeado -->
-            <Button
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextAdicionales"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:inputType="textMultiLine"
+                    android:gravity="top"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEnviarReserva"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Enviar Reserva"
-                android:textColor="#FFFFFF"
+                android:layout_height="54dp"
+                android:layout_marginBottom="12dp"
                 android:backgroundTint="#FF9800"
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp"
-                android:layout_gravity="center" />
+                android:fontFamily="@font/oswald_font"
+                android:text="ENVIAR RESERVA"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                app:cornerRadius="14dp" />
 
-            <!-- Nuevo Botón: Enviar Reserva con Recompensa -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEnviarReservaRecompensa"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="16dp"
-                android:backgroundTint="#B0BEC5"
-                android:text="Usar Recompensa"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#1E1E1E"
+                android:fontFamily="@font/oswald_font"
+                android:text="USAR RECOMPENSA"
+                android:textColor="#FF9800"
+                android:textSize="15sp"
+                app:cornerRadius="14dp"
+                app:strokeColor="#FF9800"
+                app:strokeWidth="1.5dp" />
 
-            <!-- Botón de Cancelar -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancelar"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Cancelar"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#1E1E1E"
-                android:layout_marginTop="16dp"
-                android:textSize="18sp" />
+                android:layout_height="48dp"
+                android:backgroundTint="#1A1A1A"
+                android:fontFamily="@font/oswald_font"
+                android:text="CANCELAR"
+                android:textColor="#666666"
+                android:textSize="14sp"
+                app:cornerRadius="14dp" />
 
         </LinearLayout>
-    </android.widget.ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

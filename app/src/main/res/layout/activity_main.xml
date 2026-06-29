@@ -77,29 +77,19 @@
             android:textColorHint="#888"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <ProgressBar
-        android:id="@+id/progressLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/layoutContraseña"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <Button
         android:id="@+id/btnIngresarApp"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="#1E1E1E"
         android:text="Ingresar"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         app:cornerRadius="12dp"
-        app:layout_constraintTop_toBottomOf="@id/progressLogin"
+        app:layout_constraintTop_toBottomOf="@id/layoutContraseña"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -115,5 +105,45 @@
         app:layout_constraintTop_toBottomOf="@id/btnIngresarApp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Diamond loading overlay -->
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#E6000000"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/ivDiamondLoading"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_diamond_loading"
+                android:contentDescription="Cargando" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Iniciando sesión..."
+                android:textColor="#FF9800"
+                android:textSize="16sp"
+                android:fontFamily="@font/oswald_font"
+                android:letterSpacing="0.05" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,11 +3,11 @@ package com.diamond.appcliente.repository.impl
 import com.auth0.android.jwt.JWT
 import com.diamond.appcliente.api.AuthApiService
 import com.diamond.appcliente.di.UnauthenticatedApi
-import com.diamond.appcliente.dto.login.LoginRequest
-import com.diamond.appcliente.dto.recuperacion.RecuperacionRequest
+import com.diamond.barbershop.shared.dto.login.LoginRequest
+import com.diamond.barbershop.shared.dto.recuperacion.RecuperacionRequest
 import com.diamond.appcliente.repository.AuthRepository
 import com.diamond.appcliente.repository.UserSession
-import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.barbershop.shared.util.PreferenciasHelper
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(

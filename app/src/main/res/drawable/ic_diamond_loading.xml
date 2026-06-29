@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Left crown facet -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M27,14 L8,44 L50,44 Z" />
+
+    <!-- Center crown (table face) -->
+    <path
+        android:fillColor="#FF9800"
+        android:pathData="M27,14 L73,14 L50,44 Z" />
+
+    <!-- Right crown facet -->
+    <path
+        android:fillColor="#FFA726"
+        android:pathData="M73,14 L92,44 L50,44 Z" />
+
+    <!-- Left pavilion -->
+    <path
+        android:fillColor="#BF6000"
+        android:pathData="M8,44 L50,44 L50,92 Z" />
+
+    <!-- Right pavilion -->
+    <path
+        android:fillColor="#7A3D00"
+        android:pathData="M50,44 L92,44 L50,92 Z" />
+
+    <!-- Table highlight -->
+    <path
+        android:fillColor="#FFECB3"
+        android:fillAlpha="0.5"
+        android:pathData="M38,14 L62,14 L50,30 Z" />
+
+</vector>

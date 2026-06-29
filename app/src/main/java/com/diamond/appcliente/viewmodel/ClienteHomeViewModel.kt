@@ -1,7 +1,7 @@
 package com.diamond.appcliente.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.diamond.appcliente.util.PreferenciasHelper
+import com.diamond.barbershop.shared.util.PreferenciasHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

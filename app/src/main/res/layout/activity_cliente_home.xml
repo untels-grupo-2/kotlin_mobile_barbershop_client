@@ -98,7 +98,7 @@
                         android:layout_marginStart="20dp"
                         android:contentDescription="Cliente"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/barberia2"
+                        android:src="@drawable/perfil_default"
                         app:layout_constraintBottom_toBottomOf="@id/clienteInfoLayout"
                         app:layout_constraintEnd_toStartOf="@id/textContainer"
                         app:layout_constraintStart_toStartOf="parent"
@@ -123,7 +123,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/oswald_font"
-                            android:text="Joan Rafael"
+                            android:text=""
                             android:textColor="#FFFFFF"
                             android:textSize="25sp"
                             android:textStyle="bold" />
@@ -175,19 +175,58 @@
                             android:background="@drawable/bg_meta_cortes"
                             android:fontFamily="@font/oswald_font"
                             android:padding="8dp"
-                            android:text="2/10 Cortes"
+                            android:text="0/7 Cortes"
                             android:textColor="#ffffff"
                             android:textSize="14sp" />
                     </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/metaProgresoImagen"
+                    <!-- 7 progress dots -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/fondo_cliente"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/racha" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="10dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp">
+
+                        <ImageView android:id="@+id/rachaDot1" android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_racha_dot" />
+                        <View android:layout_width="0dp" android:layout_height="2dp" android:layout_weight="1" android:background="#333333" />
+                        <ImageView android:id="@+id/rachaDot2" android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_racha_dot" />
+                        <View android:layout_width="0dp" android:layout_height="2dp" android:layout_weight="1" android:background="#333333" />
+                        <ImageView android:id="@+id/rachaDot3" android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_racha_dot" />
+                        <View android:layout_width="0dp" android:layout_height="2dp" android:layout_weight="1" android:background="#333333" />
+                        <ImageView android:id="@+id/rachaDot4" android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_racha_dot" />
+                        <View android:layout_width="0dp" android:layout_height="2dp" android:layout_weight="1" android:background="#333333" />
+                        <ImageView android:id="@+id/rachaDot5" android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_racha_dot" />
+                        <View android:layout_width="0dp" android:layout_height="2dp" android:layout_weight="1" android:background="#333333" />
+                        <ImageView android:id="@+id/rachaDot6" android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_racha_dot" />
+                        <View android:layout_width="0dp" android:layout_height="2dp" android:layout_weight="1" android:background="#333333" />
+                        <ImageView android:id="@+id/rachaDot7" android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_racha_dot" />
+                    </LinearLayout>
+
+                    <!-- Milestone labels -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:layout_marginTop="4dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="¡Vamos!" android:textColor="#888888" android:fontFamily="@font/oswald_font" android:textSize="10sp" android:gravity="start" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="¡Cerca!" android:textColor="#888888" android:fontFamily="@font/oswald_font" android:textSize="10sp" android:gravity="center" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="¡META!" android:textColor="#FF9800" android:fontFamily="@font/oswald_font" android:textSize="10sp" android:gravity="end" />
+                    </LinearLayout>
+
+                    <!-- Badge showing current racha level -->
+                    <ImageView
+                        android:id="@+id/metaProgresoImagen"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="4dp"
+                        android:src="@drawable/ic_racha_1" />
                 </LinearLayout>
 
                 <!-- Carrusel de promociones -->
@@ -209,13 +248,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:background="@drawable/border_titulo_servicios"
                     android:fontFamily="@font/oswald_font"
                     android:gravity="center"
-                    android:padding="8dp"
-                    android:text="Nuestros Servicios"
-                    android:textColor="#FFD700"
-                    android:textSize="20sp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:text="— NUESTROS SERVICIOS —"
+                    android:textColor="#FF9800"
+                    android:textSize="17sp"
+                    android:letterSpacing="0.1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/lineaNaranjaServicios" />
@@ -233,51 +275,76 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp">
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/serviciosButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="16dp"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
                             android:backgroundTint="#FF9800"
+                            android:fontFamily="@font/oswald_font"
                             android:text="Todos"
-                            android:textColor="#000000" />
+                            android:textColor="#000000"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp" />
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/cortesButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="16dp"
-                            android:backgroundTint="#FF9800"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#2A2A2A"
+                            android:fontFamily="@font/oswald_font"
                             android:text="Cortes"
-                            android:textColor="#000000" />
+                            android:textColor="#FF9800"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="#FF9800"
+                            app:strokeWidth="1dp" />
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/SkincareButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="16dp"
-                            android:backgroundTint="#FF9800"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#2A2A2A"
+                            android:fontFamily="@font/oswald_font"
                             android:text="Skincare"
-                            android:textColor="#000000" />
+                            android:textColor="#FF9800"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="#FF9800"
+                            app:strokeWidth="1dp" />
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/AfeitadoButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="#FF9800"
-                            android:layout_marginEnd="16dp"
-                            android:text="Afeitado de Barba"
-                            android:textColor="#000000" />
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#2A2A2A"
+                            android:fontFamily="@font/oswald_font"
+                            android:text="Afeitado"
+                            android:textColor="#FF9800"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="#FF9800"
+                            app:strokeWidth="1dp" />
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/ColoracionButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="#FF9800"
+                            android:layout_height="36dp"
+                            android:backgroundTint="#2A2A2A"
+                            android:fontFamily="@font/oswald_font"
                             android:text="Coloración"
-                            android:textColor="#000000" />
+                            android:textColor="#FF9800"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="#FF9800"
+                            app:strokeWidth="1dp" />
                     </LinearLayout>
                 </HorizontalScrollView>
 
@@ -301,15 +368,28 @@
             android:id="@+id/bottomNavigationView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#333333"
+            android:background="@drawable/bg_bottom_nav"
+            android:elevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:itemIconTint="@drawable/color_state_list"
-            app:itemTextColor="@color/white"
+            app:itemTextColor="@drawable/color_state_list"
             app:menu="@menu/bottom_nav_menu"
             app:itemBackground="@drawable/no_ripple_background"
             app:itemRippleColor="@android:color/transparent"/>
+
+        <ProgressBar
+            android:id="@+id/progressBarHome"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateTint="#FF9800"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -2,8 +2,11 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.App_Cliente" parent="Theme.Material3.Light.NoActionBar">
 
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Orange as primary brand color (fixes RadioButton, switches, etc.) -->
+        <item name="colorPrimary">#FF9800</item>
+        <item name="colorOnPrimary">#000000</item>
+        <!-- Remove fuchsia active indicator from BottomNavigationView -->
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
 
     </style>
 

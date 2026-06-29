@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
-import com.diamond.appcliente.dto.servicio.ServicioDto
+import com.diamond.barbershop.shared.dto.servicio.ServicioDto
 
 class ServicioAdapter(
     private var servicios: List<ServicioDto>,
