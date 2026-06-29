@@ -308,7 +308,7 @@
                 android:backgroundTint="#1E1E1E"
                 android:fontFamily="@font/oswald_font"
                 android:text="USAR RECOMPENSA"
-                android:textColor="#FF9800"
+                android:textColor="#ffffffff"
                 android:textSize="15sp"
                 app:cornerRadius="14dp"
                 app:strokeColor="#FF9800"

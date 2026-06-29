@@ -72,20 +72,44 @@
                 android:textColor="#CCCCCC"
                 android:textSize="13sp" />
 
-            <TextView
-                android:id="@+id/tv_estado"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/bg_meta_cortes"
-                android:fontFamily="@font/oswald_font"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:text="Estado"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tv_estado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_meta_cortes"
+                    android:fontFamily="@font/oswald_font"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="Estado"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_recompensa_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_meta_title_achieved"
+                    android:fontFamily="@font/oswald_font"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="✦ RECOMPENSA"
+                    android:textColor="#1A1A1A"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.04"
+                    android:visibility="gone" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

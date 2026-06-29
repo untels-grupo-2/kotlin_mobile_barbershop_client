@@ -137,7 +137,7 @@ class UsuarioActivity : AuthActivity() {
     }
 
     private fun actualizarProgresoRecompensa(reservasAcumuladas: Int) {
-        val umbral = 7
+        val umbral = 10
         val count = reservasAcumuladas.coerceAtMost(umbral)
         val porcentaje = (count * 100) / umbral
         textProgresoReservas.text = "$count de $umbral reservas para tu próxima reserva gratuita"

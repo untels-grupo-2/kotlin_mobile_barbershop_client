@@ -50,6 +50,8 @@ class ClienteHomeActivity : AuthActivity() {
 
     private lateinit var clienteNombre: TextView
     private lateinit var clienteFoto: ImageView
+    private lateinit var metaTexto: TextView
+    private lateinit var metaDescripcionTexto: TextView
     private lateinit var metaProgresoTexto: TextView
     private lateinit var metaProgresoImagen: ImageView
     private lateinit var progressBarHome: ProgressBar
@@ -63,6 +65,8 @@ class ClienteHomeActivity : AuthActivity() {
 
         clienteNombre = findViewById(R.id.clienteNombre)
         clienteFoto = findViewById(R.id.clienteFoto)
+        metaTexto = findViewById(R.id.metaTexto)
+        metaDescripcionTexto = findViewById(R.id.metaDescripcionTexto)
         metaProgresoTexto = findViewById(R.id.metaProgresoTexto)
         metaProgresoImagen = findViewById(R.id.metaProgresoImagen)
         progressBarHome = findViewById(R.id.progressBarHome)
@@ -154,7 +158,7 @@ class ClienteHomeActivity : AuthActivity() {
                     listarReservaViewModel.reservas.collect { state ->
                         if (state is UiState.Success) {
                             var count = state.data.count { it.estRecompensa == 0 }
-                            if (count > 7) count = 7
+                            if (count > 10) count = 10
                             updateMetaProgress(count)
                             val prefs = getSharedPreferences("diamond_prefs", MODE_PRIVATE)
                             if (!prefs.getBoolean("welcome_shown", false)) {
@@ -242,11 +246,12 @@ class ClienteHomeActivity : AuthActivity() {
 
     private val rachaDotIds = intArrayOf(
         R.id.rachaDot1, R.id.rachaDot2, R.id.rachaDot3, R.id.rachaDot4,
-        R.id.rachaDot5, R.id.rachaDot6, R.id.rachaDot7
+        R.id.rachaDot5, R.id.rachaDot6, R.id.rachaDot7, R.id.rachaDot8,
+        R.id.rachaDot9, R.id.rachaDot10
     )
 
     private fun updateMetaProgress(count: Int) {
-        metaProgresoTexto.text = "$count/7 Cortes"
+        metaProgresoTexto.text = "$count/10 Cortes"
 
         rachaDotIds.forEachIndexed { index, id ->
             val dot = findViewById<ImageView>(id)
@@ -257,15 +262,32 @@ class ClienteHomeActivity : AuthActivity() {
         }
 
         val badgeRes = when (count) {
-            0 -> R.drawable.ic_racha_1
-            1 -> R.drawable.ic_racha_1
-            2 -> R.drawable.ic_racha_2
-            3 -> R.drawable.ic_racha_3
-            4 -> R.drawable.ic_racha_4
-            5 -> R.drawable.ic_racha_5
-            6 -> R.drawable.ic_racha_6
-            else -> R.drawable.ic_racha_7
+            0, 1 -> R.drawable.ic_racha_1
+            2    -> R.drawable.ic_racha_2
+            3    -> R.drawable.ic_racha_3
+            4    -> R.drawable.ic_racha_4
+            5    -> R.drawable.ic_racha_5
+            6    -> R.drawable.ic_racha_6
+            7    -> R.drawable.ic_racha_7
+            8    -> R.drawable.ic_racha_8
+            9    -> R.drawable.ic_racha_9
+            else -> R.drawable.ic_racha_10
         }
         metaProgresoImagen.setImageResource(badgeRes)
+
+        if (count >= 10) {
+            metaTexto.text = "✦ ALCANZASTE LA META ✦"
+            metaTexto.setBackgroundResource(R.drawable.bg_meta_title_achieved)
+            metaTexto.setTextColor(Color.parseColor("#1A1A1A"))
+            metaDescripcionTexto.text = "¡Visítanos para canjear\ntu recompensa!"
+            metaDescripcionTexto.setTextColor(Color.parseColor("#FFB300"))
+        } else {
+            metaTexto.text = "Alcanza la meta"
+            metaTexto.setBackgroundResource(R.drawable.bg_meta_title)
+            metaTexto.setTextColor(Color.parseColor("#000000"))
+            val faltan = 10 - count
+            metaDescripcionTexto.text = "Te falta${if (faltan == 1) "" else "n"} $faltan corte${if (faltan == 1) "" else "s"} para\ntu recompensa"
+            metaDescripcionTexto.setTextColor(Color.parseColor("#666666"))
+        }
     }
 }

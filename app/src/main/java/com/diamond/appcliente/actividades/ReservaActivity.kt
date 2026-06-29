@@ -93,7 +93,7 @@ class ReservaActivity : AuthActivity() {
                 launch {
                     listarReservaViewModel.reservas.collect { state ->
                         if (state is UiState.Success) {
-                            activarBotonReservaRecompensa(state.data.count { it.estRecompensa == 0 } >= 7)
+                            activarBotonReservaRecompensa(state.data.count { it.estRecompensa == 0 } >= 10)
                         }
                     }
                 }

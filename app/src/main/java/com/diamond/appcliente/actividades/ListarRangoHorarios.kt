@@ -147,7 +147,9 @@ class ListarRangoHorarios : AuthActivity() {
             { _, year, month, dayOfMonth ->
                 val fechaSeleccionada = Calendar.getInstance()
                 fechaSeleccionada.set(year, month, dayOfMonth)
-                textFechaSeleccionada.text = SimpleDateFormat("yyyy-MM-dd", locale).format(fechaSeleccionada.time)
+                val dateStr = SimpleDateFormat("yyyy-MM-dd", locale).format(fechaSeleccionada.time)
+                textFechaSeleccionada.text = dateStr
+                horarioRangoAdapter.updateSelectedDate(dateStr)
             },
             calendario.get(Calendar.YEAR), calendario.get(Calendar.MONTH), calendario.get(Calendar.DAY_OF_MONTH)
         )
@@ -165,6 +167,10 @@ class ListarRangoHorarios : AuthActivity() {
             }
         })
         recyclerView.adapter = horarioRangoAdapter
+        val currentDate = textFechaSeleccionada.text.toString()
+        if (currentDate != "Selecciona una fecha") {
+            horarioRangoAdapter.updateSelectedDate(currentDate)
+        }
     }
 
     private fun obtenerTipoHorario(botonSeleccionado: String): String {
