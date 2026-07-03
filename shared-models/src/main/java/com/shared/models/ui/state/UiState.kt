@@ -1,4 +1,4 @@
-package com.diamond.appcliente.ui.state
+package com.shared.models.ui.state
 
 sealed class UiState<out T> {
     object Idle : UiState<Nothing>()

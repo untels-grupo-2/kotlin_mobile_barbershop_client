@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
-import com.diamond.appcliente.ui.state.UiState
+import com.shared.models.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.diamond.barbershop.shared.dto.servicio.ServicioDto
 import com.diamond.barbershop.shared.dto.servicio.ServicioRequest

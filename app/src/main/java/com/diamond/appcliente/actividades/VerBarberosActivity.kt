@@ -12,7 +12,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.BarberoDisponibleAdapter
-import com.diamond.appcliente.ui.state.UiState
+import com.shared.models.ui.state.UiState
 import com.diamond.appcliente.viewmodel.HorarioBarberoInstanciaViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -77,7 +76,7 @@ class VerBarberosActivity : AuthActivity() {
         horarioRangoId = intent.getIntExtra("horarioRangoId", -1).toLong()
         Log.d("VerBarberosActivity", "horarioRangoId recibido: $horarioRangoId")
 
-        tipoHorarioId = obtenerTipoHorarioValor(tipoHorario)
+        tipoHorarioId = viewModel.tipoHorarioToId(tipoHorario)
 
         Log.d("VerBarberosActivity", "Fecha: $fecha | TipoHorarioId: $tipoHorarioId | HorarioRangoId: $horarioRangoId | servicioID: $servicio_id")
 
@@ -134,17 +133,6 @@ class VerBarberosActivity : AuthActivity() {
     }
 
     private fun obtenerBarberosDisponibles() {
-        if (tipoHorarioId == -1L || horarioRangoId == -1L || fecha == null) {
-            Log.e("VerBarberosActivity", "Los valores tipoHorarioId, horarioRangoId o fecha no son válidos.")
-            return
-        }
-        viewModel.obtenerBarberosDisponibles(fecha!!, tipoHorarioId, horarioRangoId)
-    }
-
-    private fun obtenerTipoHorarioValor(tipoHorario: String?): Long = when (tipoHorario) {
-        "MAÑANA" -> 1L
-        "TARDE" -> 2L
-        "NOCHE" -> 3L
-        else -> -1L
+        viewModel.cargarBarberosDisponibles(fecha, tipoHorario, horarioRangoId)
     }
 }

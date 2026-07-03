@@ -7,12 +7,10 @@ import com.diamond.barbershop.shared.dto.barbero.BarberoDto
 import com.diamond.barbershop.shared.dto.barbero.BarberoRequest
 import com.diamond.appcliente.dto.barbero.DtoBarberoDisponible
 import com.diamond.appcliente.repository.BarberoRepository
-import com.diamond.barbershop.shared.util.PreferenciasHelper
 import javax.inject.Inject
 
 class BarberoRepositoryImpl @Inject constructor(
-    @AuthenticatedApi private val apiService: AuthApiService,
-    private val preferenciasHelper: PreferenciasHelper
+    @AuthenticatedApi private val apiService: AuthApiService
 ) : BarberoRepository {
 
     override suspend fun listarBarberos(): List<BarberoDto> {
@@ -40,9 +38,8 @@ class BarberoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun obtenerBarberosDisponibles(fecha: String, tipoHorarioId: Long, horarioRangoId: Long): List<DtoBarberoDisponible> {
-        val token = preferenciasHelper.obtenerToken() ?: throw Exception("Token no encontrado")
         Log.d("BarberoRepository", "Fecha: $fecha | TipoHorarioId: $tipoHorarioId | HorarioRangoId: $horarioRangoId")
-        val response = apiService.obtenerBarberosDisponibles("Bearer $token", fecha, tipoHorarioId, horarioRangoId)
+        val response = apiService.obtenerBarberosDisponibles(fecha, tipoHorarioId, horarioRangoId)
         if (response.isSuccessful && response.body() != null) {
             Log.d("BarberoRepository", "Código: ${response.code()} | Cuerpo: ${response.body()}")
             return response.body()!!.data ?: emptyList()

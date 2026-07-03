@@ -19,7 +19,7 @@ import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.BarberoAdapter
 import com.diamond.barbershop.shared.dto.barbero.BarberoDto
-import com.diamond.appcliente.ui.state.UiState
+import com.shared.models.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarBarberoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -58,8 +58,8 @@ class GestionarBarberoActivity : AuthActivity() {
         apellidoCliente = intent.getStringExtra("apellidoCliente")
         tipoHorario = intent.getStringExtra("tipoHorario")
 
-        tipoHorarioValor = obtenerTipoHorarioValor(tipoHorario)
-        turnoReservaValor = obtenerTurnoReservaValor(turnoReserva)
+        tipoHorarioValor = viewModel.tipoHorarioToValor(tipoHorario)
+        turnoReservaValor = viewModel.turnoReservaToValor(turnoReserva)
 
         Log.d("GestionarBarberoActivity", "Tipo Horario Valor: $tipoHorarioValor | Turno Reserva Valor: $turnoReservaValor")
 
@@ -126,14 +126,4 @@ class GestionarBarberoActivity : AuthActivity() {
         dialog.show()
     }
 
-    private fun obtenerTipoHorarioValor(tipoHorario: String?): Int = when (tipoHorario) {
-        "MAÑANA" -> 1; "TARDE" -> 2; "NOCHE" -> 3; else -> -1
-    }
-
-    private fun obtenerTurnoReservaValor(boton: String?): Int = when (boton) {
-        "9 AM - 10 AM" -> 1; "10 AM - 11 AM" -> 2; "11 AM - 12 PM" -> 3; "12 PM - 1 PM" -> 4
-        "1 PM - 2 PM" -> 5; "2 PM - 3 PM" -> 6; "3 PM - 4 PM" -> 7; "4 PM - 5 PM" -> 8
-        "5 PM - 6 PM" -> 9; "6 PM - 7 PM" -> 10; "7 PM - 8 PM" -> 11; "8 PM - 9 PM" -> 12
-        "9 PM - 10 PM" -> 13; else -> -1
-    }
 }

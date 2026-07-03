@@ -1,4 +1,4 @@
-﻿package com.diamond.appcliente.actividades
+package com.diamond.appcliente.actividades
 
 import android.content.Intent
 import android.graphics.Color
@@ -16,28 +16,25 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.auth0.android.jwt.JWT
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
 import com.diamond.barbershop.shared.dto.servicio.ServicioDto
-import com.diamond.appcliente.ui.state.UiState
-import com.diamond.barbershop.shared.util.PreferenciasHelper
+import com.shared.models.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
+import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SeccionServiciosActivity : AuthActivity() {
-
-    @Inject lateinit var preferenciasHelper: PreferenciasHelper
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBarServicios: ProgressBar
     private var adapter: ServicioAdapter? = null
     private var listaServicios: List<ServicioDto> = emptyList()
     private val viewModel1: GestionarServicioViewModel by viewModels()
+    private val usuarioViewModel: UsuarioViewModel by viewModels()
 
     private var nombreCliente: String? = null
     private var apellidoCliente: String? = null
@@ -45,11 +42,6 @@ class SeccionServiciosActivity : AuthActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_area_servicios)
-
-        val token = preferenciasHelper.obtenerToken()
-        val jwt = JWT(token!!)
-        nombreCliente = jwt.getClaim("nombre").asString()
-        apellidoCliente = jwt.getClaim("apellido").asString()
 
         recyclerView = findViewById(R.id.recyclerViewServicios)
         progressBarServicios = findViewById(R.id.progressBarServicios)
@@ -79,6 +71,14 @@ class SeccionServiciosActivity : AuthActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    usuarioViewModel.usuario.collect { state ->
+                        if (state is UiState.Success) {
+                            nombreCliente = state.data.nombre
+                            apellidoCliente = state.data.apellido
+                        }
+                    }
+                }
                 launch {
                     viewModel1.servicios.collect { state ->
                         when (state) {
@@ -115,6 +115,7 @@ class SeccionServiciosActivity : AuthActivity() {
             }
         }
 
+        usuarioViewModel.obtenerMiUsuario()
         viewModel1.cargarServicios()
     }
 

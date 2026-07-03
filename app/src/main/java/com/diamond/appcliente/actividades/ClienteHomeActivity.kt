@@ -30,7 +30,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.ServicioAdapter
 import com.diamond.barbershop.shared.dto.servicio.ServicioDto
-import com.diamond.appcliente.ui.state.UiState
+import com.shared.models.ui.state.UiState
+import com.diamond.appcliente.viewmodel.ClienteHomeViewModel
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
@@ -47,6 +48,7 @@ class ClienteHomeActivity : AuthActivity() {
     private val viewModel1: GestionarServicioViewModel by viewModels()
     private val listarReservaViewModel: ListarReservaViewModel by viewModels()
     private val usuarioViewModel: UsuarioViewModel by viewModels()
+    private val clienteHomeViewModel: ClienteHomeViewModel by viewModels()
 
     private lateinit var clienteNombre: TextView
     private lateinit var clienteFoto: ImageView
@@ -157,12 +159,9 @@ class ClienteHomeActivity : AuthActivity() {
                 launch {
                     listarReservaViewModel.reservas.collect { state ->
                         if (state is UiState.Success) {
-                            var count = state.data.count { it.estRecompensa == 0 }
-                            if (count > 10) count = 10
+                            val count = listarReservaViewModel.recompensaCount.value.coerceAtMost(10)
                             updateMetaProgress(count)
-                            val prefs = getSharedPreferences("diamond_prefs", MODE_PRIVATE)
-                            if (!prefs.getBoolean("welcome_shown", false)) {
-                                prefs.edit().putBoolean("welcome_shown", true).apply()
+                            if (clienteHomeViewModel.consumirBienvenidaSiPendiente()) {
                                 mostrarBienvenidaRacha(count)
                             }
                         }

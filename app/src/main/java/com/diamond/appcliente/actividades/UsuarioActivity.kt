@@ -15,23 +15,18 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.auth0.android.jwt.JWT
 import com.bumptech.glide.Glide
 import com.diamond.appcliente.R
-import com.diamond.appcliente.dto.usuario.UsuarioDto
-import com.diamond.appcliente.ui.state.UiState
-import com.diamond.barbershop.shared.util.PreferenciasHelper
+import com.shared.models.ui.state.UiState
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class UsuarioActivity : AuthActivity() {
@@ -51,8 +46,6 @@ class UsuarioActivity : AuthActivity() {
     private var layoutImagenSeleccionadaRef: android.view.View? = null
     private var btnSeleccionarImagenRef: android.widget.Button? = null
 
-    @Inject lateinit var preferenciasHelper: PreferenciasHelper
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_usuario)
@@ -66,14 +59,7 @@ class UsuarioActivity : AuthActivity() {
         progressRecompensa = findViewById(R.id.progressRecompensa)
         textRecompensaDisponible = findViewById(R.id.textRecompensaDisponible)
 
-        val token = preferenciasHelper.obtenerToken()
-        if (token != null) {
-            Log.d("UsuarioActivity", "Token recibido: $token")
-            JWT(token)
-            viewModel.obtenerMiUsuario()
-        } else {
-            Log.d("UsuarioActivity", "Token no encontrado")
-        }
+        viewModel.obtenerMiUsuario()
 
         window.statusBarColor = -16777216
 
@@ -121,10 +107,8 @@ class UsuarioActivity : AuthActivity() {
                     }
                 }
                 launch {
-                    listarReservaViewModel.reservas.collect { state ->
-                        if (state is UiState.Success) {
-                            actualizarProgresoRecompensa(state.data.count { it.estRecompensa == 0 })
-                        }
+                    listarReservaViewModel.recompensaCount.collect { count ->
+                        actualizarProgresoRecompensa(count)
                     }
                 }
             }
@@ -154,14 +138,12 @@ class UsuarioActivity : AuthActivity() {
         val editTextEmail = popupView.findViewById<EditText>(R.id.etEmailUsuario)
         val editTextCelular = popupView.findViewById<EditText>(R.id.etCelularUsuario)
 
-        if (preferenciasHelper.obtenerToken() != null) {
-            val u = (viewModel.usuario.value as? UiState.Success)?.data
-            if (u != null) {
-                editTextNombre.setText(u.nombre)
-                editTextApellido.setText(u.apellido)
-                editTextEmail.setText(u.email)
-                editTextCelular.setText(u.celular)
-            }
+        val u = (viewModel.usuario.value as? UiState.Success)?.data
+        if (u != null) {
+            editTextNombre.setText(u.nombre)
+            editTextApellido.setText(u.apellido)
+            editTextEmail.setText(u.email)
+            editTextCelular.setText(u.celular)
         }
 
         val btnSeleccionarImagen = popupView.findViewById<Button>(R.id.btnSeleccionarImagenUsuario)
@@ -175,19 +157,8 @@ class UsuarioActivity : AuthActivity() {
             val apellido = editTextApellido.text.toString()
             val email = editTextEmail.text.toString()
             val celular = editTextCelular.text.toString()
-
-            if (celular.length == 9) {
-                val dtoUsuario = UsuarioDto().apply {
-                    this.nombre = nombre
-                    this.apellido = apellido
-                    this.email = email
-                    this.celular = celular
-                }
-                viewModel.actualizarMiPerfil(dtoUsuario, imagenSeleccionadaUri)
-                popupWindow.dismiss()
-            } else {
-                Toast.makeText(this, "El número de celular debe tener 9 dígitos.", Toast.LENGTH_SHORT).show()
-            }
+            viewModel.actualizarMiPerfil(nombre, apellido, email, celular, imagenSeleccionadaUri)
+            popupWindow.dismiss()
         }
 
         popupView.findViewById<Button>(R.id.btnCancelarActualizarUsuario).setOnClickListener {
@@ -223,8 +194,7 @@ class UsuarioActivity : AuthActivity() {
     }
 
     private fun cerrarSesion() {
-        getSharedPreferences("diamond_prefs", MODE_PRIVATE).edit().putBoolean("welcome_shown", false).apply()
-        preferenciasHelper.limpiarPreferencias()
+        viewModel.cerrarSesion()
         Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP

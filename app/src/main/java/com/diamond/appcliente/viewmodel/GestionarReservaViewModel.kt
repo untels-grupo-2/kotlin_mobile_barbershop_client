@@ -25,9 +25,10 @@ class GestionarReservaViewModel @Inject constructor(
     private val _evento = MutableSharedFlow<ReservaUiEvent>()
     val evento: SharedFlow<ReservaUiEvent> = _evento.asSharedFlow()
 
-    fun enviarReserva(request: DtoReserva) {
+    fun enviarReserva(barberoId: Long, horarioRangoId: Long, fecha: String, servicioId: Long, adicionales: String) {
         viewModelScope.launch {
             try {
+                val request = DtoReserva(barberoId, horarioRangoId, fecha, servicioId, adicionales)
                 _evento.emit(ReservaUiEvent.Exito(reservaRepository.crearReserva(request)))
             } catch (e: Exception) {
                 Log.e("GestionarReservaViewModel", "Error al crear reserva", e)
@@ -36,9 +37,10 @@ class GestionarReservaViewModel @Inject constructor(
         }
     }
 
-    fun crearReservaRecompensa(request: DtoReserva) {
+    fun crearReservaRecompensa(barberoId: Long, horarioRangoId: Long, fecha: String, servicioId: Long, adicionales: String) {
         viewModelScope.launch {
             try {
+                val request = DtoReserva(barberoId, horarioRangoId, fecha, servicioId, adicionales)
                 _evento.emit(ReservaUiEvent.Exito(reservaRepository.crearReservaRecompensa(request)))
             } catch (e: Exception) {
                 Log.e("GestionarReservaViewModel", "Error al crear reserva recompensa", e)

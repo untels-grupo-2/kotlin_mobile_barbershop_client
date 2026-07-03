@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -18,11 +17,6 @@ import com.diamond.appcliente.R
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.io.File
-import java.io.IOException
 
 @AndroidEntryPoint
 class SubirComprobanteDialogFragment : DialogFragment() {
@@ -40,8 +34,9 @@ class SubirComprobanteDialogFragment : DialogFragment() {
         view.findViewById<Button>(R.id.btnSeleccionarImagen).setOnClickListener { seleccionarImagen() }
 
         view.findViewById<Button>(R.id.btnSubirComprobante).setOnClickListener {
-            if (imagenSeleccionadaUri != null) {
-                subirComprobante(reservaId, imagenSeleccionadaUri!!)
+            val uri = imagenSeleccionadaUri
+            if (uri != null) {
+                listarReservaViewModel.subirComprobante(reservaId, uri)
             } else {
                 Toast.makeText(context, "Por favor, seleccione una imagen", Toast.LENGTH_SHORT).show()
             }
@@ -81,26 +76,6 @@ class SubirComprobanteDialogFragment : DialogFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST && data != null) {
             imagenSeleccionadaUri = data.data
-        }
-    }
-
-    private fun subirComprobante(reservaId: Long, imagenUri: Uri) {
-        try {
-            val inputStream = requireActivity().contentResolver.openInputStream(imagenUri)!!
-            val file = File(requireActivity().cacheDir, "user_image.jpg")
-            file.outputStream().use { inputStream.copyTo(it) }
-            inputStream.close()
-
-            Log.d("SubirComprobante", "Archivo creado en: ${file.absolutePath}")
-            Log.d("SubirComprobante", "Tamaño del archivo: ${file.length()}")
-
-            val imagenPart = MultipartBody.Part.createFormData(
-                "imagen", file.name,
-                RequestBody.create(MediaType.parse("image/*"), file)
-            )
-            listarReservaViewModel.subirComprobante(reservaId, imagenPart)
-        } catch (e: IOException) {
-            Toast.makeText(activity, "Error al manejar la imagen", Toast.LENGTH_SHORT).show()
         }
     }
 
