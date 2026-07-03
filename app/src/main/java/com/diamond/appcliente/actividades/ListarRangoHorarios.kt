@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,8 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.diamond.appcliente.R
 import com.diamond.appcliente.adapters.HorarioRangoAdapter
 import com.diamond.appcliente.dto.horariorango.HorarioRangoDto
-import com.diamond.barbershop.shared.dto.servicio.ServicioRequest
-import com.diamond.appcliente.ui.state.UiState
+import com.shared.models.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarHorarioRangoViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -38,8 +36,6 @@ class ListarRangoHorarios : AuthActivity() {
     private lateinit var horarioRangoAdapter: HorarioRangoAdapter
     private lateinit var textFechaSeleccionada: TextView
     private val gestionarHorarioRangoViewModel: GestionarHorarioRangoViewModel by viewModels()
-    private lateinit var servicio: ServicioRequest
-
     private var botonSeleccionado: String? = null
     private var horarioRangoId: Int = -1
 
@@ -60,7 +56,6 @@ class ListarRangoHorarios : AuthActivity() {
         val servicio_id = intent.getIntExtra("servicio_id", -1)
 
         Log.d("ListarRangoHorarios", "Servicio ID recibido: $servicio_id")
-        servicio = ServicioRequest(nombreServicio ?: "", precioServicio, imagenUrlServicio ?: "", servicio_id)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor = Color.BLACK
@@ -103,18 +98,7 @@ class ListarRangoHorarios : AuthActivity() {
                     gestionarHorarioRangoViewModel.horarios.collect { state ->
                         when (state) {
                             is UiState.Success -> {
-                                val horarios = state.data
-                                if (horarios.isNotEmpty()) {
-                                    val todosHorarios = mutableListOf<HorarioRangoDto>()
-                                    todosHorarios.add(HorarioRangoDto(rango = "🌅 Turno mañana", tipoHorario = "Encabezado"))
-                                    horarios.filter { it.tipoHorario == "MAÑANA" }.forEach { todosHorarios.add(it) }
-                                    todosHorarios.add(HorarioRangoDto(rango = "☀️ Turno tarde", tipoHorario = "Encabezado"))
-                                    horarios.filter { it.tipoHorario == "TARDE" }.forEach { todosHorarios.add(it) }
-                                    todosHorarios.add(HorarioRangoDto(rango = "🌙 Turno noche", tipoHorario = "Encabezado"))
-                                    horarios.filter { it.tipoHorario == "NOCHE" }.forEach { todosHorarios.add(it) }
-                                    ordenarHorarios(todosHorarios)
-                                    setUpRecyclerView(todosHorarios)
-                                }
+                                if (state.data.isNotEmpty()) setUpRecyclerView(state.data)
                             }
                             is UiState.Error -> Toast.makeText(this@ListarRangoHorarios, state.message, Toast.LENGTH_SHORT).show()
                             else -> {}
@@ -173,44 +157,6 @@ class ListarRangoHorarios : AuthActivity() {
         }
     }
 
-    private fun obtenerTipoHorario(botonSeleccionado: String): String {
-        val parts = botonSeleccionado.split(" ")
-        var horaInt = parts[0].toIntOrNull() ?: return "MAÑANA"
-        val periodo = if (parts.size > 1) parts[1].uppercase() else "AM"
-        if (periodo == "PM" && horaInt != 12) horaInt += 12
-        else if (periodo == "AM" && horaInt == 12) horaInt = 12 // backend sends 12 AM for noon
-        return when {
-            horaInt in 6..12 -> "MAÑANA"
-            horaInt in 13..17 -> "TARDE"
-            else -> "NOCHE"
-        }
-    }
-
-    private fun ordenarHorarios(todosHorarios: MutableList<HorarioRangoDto>) {
-        val fmt = SimpleDateFormat("h a", java.util.Locale.US)
-
-        fun parseTime(rango: String?): Long {
-            val hora = rango?.split(" - ")?.get(0)?.trim() ?: return Long.MAX_VALUE
-            return try {
-                val fixed = if (hora == "12 AM") "12 PM" else hora
-                fmt.parse(fixed)?.time ?: Long.MAX_VALUE
-            } catch (e: Exception) { Long.MAX_VALUE }
-        }
-
-        val mananaHeader = todosHorarios.firstOrNull { it.tipoHorario == "Encabezado" && it.rango?.contains("mañana") == true }
-        val tardeHeader  = todosHorarios.firstOrNull { it.tipoHorario == "Encabezado" && it.rango?.contains("tarde")  == true }
-        val nocheHeader  = todosHorarios.firstOrNull { it.tipoHorario == "Encabezado" && it.rango?.contains("noche")  == true }
-
-        val manana = todosHorarios.filter { it.tipoHorario == "MAÑANA" }.sortedBy { parseTime(it.rango) }
-        val tarde  = todosHorarios.filter { it.tipoHorario == "TARDE"  }.sortedBy { parseTime(it.rango) }
-        val noche  = todosHorarios.filter { it.tipoHorario == "NOCHE"  }.sortedBy { parseTime(it.rango) }
-
-        todosHorarios.clear()
-        if (mananaHeader != null) { todosHorarios.add(mananaHeader); todosHorarios.addAll(manana) }
-        if (tardeHeader  != null) { todosHorarios.add(tardeHeader);  todosHorarios.addAll(tarde)  }
-        if (nocheHeader  != null) { todosHorarios.add(nocheHeader);  todosHorarios.addAll(noche)  }
-    }
-
     private fun confirmarReserva(
         nombreCliente: String?, apellidoCliente: String?, nombreServicio: String?,
         descripcionServicio: String?, imagenUrlServicio: String?,
@@ -233,7 +179,7 @@ class ListarRangoHorarios : AuthActivity() {
         intent.putExtra("descripcionServicio", descripcionServicio)
         intent.putExtra("precioServicio", precioServicio)
         intent.putExtra("imagenServicio", imagenUrlServicio)
-        intent.putExtra("tipoHorario", obtenerTipoHorario(botonSeleccionado!!))
+        intent.putExtra("tipoHorario", gestionarHorarioRangoViewModel.obtenerTipoHorario(botonSeleccionado!!))
         intent.putExtra("servicio_id", servicio_id)
         intent.putExtra("horarioRangoId", horarioRangoId)
         startActivity(intent)

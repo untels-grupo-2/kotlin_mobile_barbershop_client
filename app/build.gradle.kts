@@ -30,7 +30,7 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".local"
             versionNameSuffix = "-local"
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8081/\"")
         }
         create("staging") {
             dimension = "environment"
@@ -87,5 +87,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.fragment.ktx)
+    implementation(project(":shared-models"))
     implementation(project(":barbershop_shared"))
 }

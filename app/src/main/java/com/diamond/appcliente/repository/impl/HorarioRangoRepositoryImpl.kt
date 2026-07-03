@@ -13,7 +13,7 @@ class HorarioRangoRepositoryImpl @Inject constructor(
 
     override suspend fun obtenerHorariosRangos(tipoHorarioId: Int): List<HorarioRangoDto> {
         Log.d("HorarioRangoRepository", "Cargando horarios tipoHorarioId=$tipoHorarioId")
-        val response = apiService.obtenerHorariosRangos(tipoHorarioId)
+        val response = apiService.obtenerHorariosRangos()
         if (response.isSuccessful && response.body() != null) {
             val body = response.body()!!
             val data = body.data

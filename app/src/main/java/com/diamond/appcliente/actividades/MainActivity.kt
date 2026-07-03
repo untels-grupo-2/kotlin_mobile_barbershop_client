@@ -49,14 +49,7 @@ class MainActivity : AppCompatActivity() {
             val usuario = campoUsuario.text.toString()
             val contraseña = campoContraseña.text.toString()
 
-            if (usuario == "abc" && contraseña == "123") {
-                val intent = Intent(this, ClienteHomeActivity::class.java)
-                intent.putExtra("nombre", "Arian")
-                intent.putExtra("apellido", "Prueba")
-                intent.putExtra("urlUsuario", "url_de_imagen")
-                startActivity(intent)
-                finish()
-            } else if (usuario.isEmpty() || contraseña.isEmpty()) {
+            if (usuario.isEmpty() || contraseña.isEmpty()) {
                 Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
                 if (usuario.isEmpty()) campoUsuario.startAnimation(shakeAnimation)
                 if (contraseña.isEmpty()) campoContraseña.startAnimation(shakeAnimation)

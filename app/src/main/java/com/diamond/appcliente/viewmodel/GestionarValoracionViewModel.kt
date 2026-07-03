@@ -24,10 +24,14 @@ class GestionarValoracionViewModel @Inject constructor(
     private val _evento = MutableSharedFlow<ValoracionUiEvent>()
     val evento: SharedFlow<ValoracionUiEvent> = _evento.asSharedFlow()
 
-    fun enviarValoracion(request: ValoracionRequest) {
+    fun submitValoracion(valoracion: Int, utilidad: Boolean?, comentario: String) {
         viewModelScope.launch {
+            if (valoracion == -1 || utilidad == null || comentario.isEmpty()) {
+                _evento.emit(ValoracionUiEvent.Error("Por favor, complete todos los campos"))
+                return@launch
+            }
             try {
-                _evento.emit(ValoracionUiEvent.Exito(valoracionRepository.crearValoracion(request)))
+                _evento.emit(ValoracionUiEvent.Exito(valoracionRepository.crearValoracion(ValoracionRequest(valoracion, utilidad, comentario))))
             } catch (e: Exception) {
                 _evento.emit(ValoracionUiEvent.Error(e.message ?: "Error desconocido"))
             }

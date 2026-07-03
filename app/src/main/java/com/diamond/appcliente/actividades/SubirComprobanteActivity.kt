@@ -22,10 +22,6 @@ import com.diamond.appcliente.viewmodel.ListarReservaViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.io.File
 import java.io.IOException
 
 @AndroidEntryPoint
@@ -52,8 +48,9 @@ class SubirComprobanteActivity : AuthActivity() {
         findViewById<Button>(R.id.btnSeleccionarImagen).setOnClickListener { seleccionarImagen() }
 
         findViewById<Button>(R.id.btnSubirComprobante).setOnClickListener {
-            if (imagenSeleccionadaUri != null) {
-                subirComprobante(reservaId, imagenSeleccionadaUri!!)
+            val uri = imagenSeleccionadaUri
+            if (uri != null) {
+                listarReservaViewModel.subirComprobante(reservaId, uri)
             } else {
                 Toast.makeText(this, "Por favor, seleccione una imagen", Toast.LENGTH_SHORT).show()
             }
@@ -124,24 +121,6 @@ class SubirComprobanteActivity : AuthActivity() {
             findViewById<android.widget.TextView>(R.id.tvPlaceholder).visibility = View.GONE
         } catch (e: IOException) {
             Log.e("SubirComprobanteActivity", "Error al mostrar la vista previa de la imagen", e)
-        }
-    }
-
-    private fun subirComprobante(reservaId: Long, imagenUri: Uri) {
-        try {
-            val inputStream = contentResolver.openInputStream(imagenUri)!!
-            val file = File(cacheDir, "user_image.jpg")
-            file.outputStream().use { inputStream.copyTo(it) }
-            inputStream.close()
-
-            val imagenPart = MultipartBody.Part.createFormData(
-                "imagen", file.name,
-                RequestBody.create(MediaType.parse("image/*"), file)
-            )
-            listarReservaViewModel.subirComprobante(reservaId, imagenPart)
-        } catch (e: IOException) {
-            Log.e("SubirComprobanteActivity", "Error al manejar la imagen", e)
-            Toast.makeText(this, "Error al manejar la imagen", Toast.LENGTH_SHORT).show()
         }
     }
 

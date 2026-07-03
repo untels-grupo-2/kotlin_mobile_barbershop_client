@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diamond.barbershop.shared.dto.barbero.BarberoDto
 import com.diamond.appcliente.repository.BarberoRepository
-import com.diamond.appcliente.ui.state.UiState
+import com.shared.models.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,5 +71,17 @@ class GestionarBarberoViewModel @Inject constructor(
                 _crudError.emit(e.message ?: "Error desconocido")
             }
         }
+    }
+
+    fun tipoHorarioToValor(tipoHorario: String?): Int = when (tipoHorario) {
+        "MAÑANA" -> 1; "TARDE" -> 2; "NOCHE" -> 3; else -> -1
+    }
+
+    fun turnoReservaToValor(turno: String?): Int = when (turno) {
+        "9 AM - 10 AM"  -> 1;  "10 AM - 11 AM" -> 2;  "11 AM - 12 PM" -> 3
+        "12 PM - 1 PM"  -> 4;  "1 PM - 2 PM"   -> 5;  "2 PM - 3 PM"   -> 6
+        "3 PM - 4 PM"   -> 7;  "4 PM - 5 PM"   -> 8;  "5 PM - 6 PM"   -> 9
+        "6 PM - 7 PM"   -> 10; "7 PM - 8 PM"   -> 11; "8 PM - 9 PM"   -> 12
+        "9 PM - 10 PM"  -> 13; else -> -1
     }
 }

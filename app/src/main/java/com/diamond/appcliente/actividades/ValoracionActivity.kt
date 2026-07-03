@@ -17,7 +17,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
-import com.diamond.appcliente.dto.valoracion.ValoracionRequest
 import com.google.android.material.appbar.MaterialToolbar
 import com.diamond.appcliente.viewmodel.GestionarValoracionViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,7 +65,9 @@ class ValoracionActivity : AuthActivity() {
             finish()
         }
 
-        findViewById<Button>(R.id.btnEnviarValoracion).setOnClickListener { enviarValoracion() }
+        findViewById<Button>(R.id.btnEnviarValoracion).setOnClickListener {
+            viewModel.submitValoracion(getValoracionSeleccionada(), getFacilidadSeleccionada(), editTextComentario.text.toString())
+        }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -93,18 +94,6 @@ class ValoracionActivity : AuthActivity() {
                     }
                 }
             }
-        }
-    }
-
-    private fun enviarValoracion() {
-        val valoracion = getValoracionSeleccionada()
-        val utilidad = getFacilidadSeleccionada()
-        val mensaje = editTextComentario.text.toString()
-
-        if (valoracion != -1 && utilidad != null && mensaje.isNotEmpty()) {
-            viewModel.enviarValoracion(ValoracionRequest(valoracion, utilidad, mensaje))
-        } else {
-            Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
         }
     }
 

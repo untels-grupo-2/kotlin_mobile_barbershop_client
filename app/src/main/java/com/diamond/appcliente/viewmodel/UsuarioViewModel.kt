@@ -7,7 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.diamond.appcliente.dto.usuario.UsuarioDto
 import com.diamond.appcliente.repository.UsuarioRepository
-import com.diamond.appcliente.ui.state.UiState
+import com.diamond.barbershop.shared.util.PreferenciasHelper
+import com.shared.models.ui.state.UiState
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UsuarioViewModel @Inject constructor(
     private val usuarioRepository: UsuarioRepository,
+    private val preferenciasHelper: PreferenciasHelper,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -39,6 +41,12 @@ class UsuarioViewModel @Inject constructor(
 
     private val _error = MutableSharedFlow<String>()
     val error: SharedFlow<String> = _error.asSharedFlow()
+
+    fun cerrarSesion() {
+        context.getSharedPreferences("diamond_prefs", Context.MODE_PRIVATE)
+            .edit().putBoolean("welcome_shown", false).apply()
+        preferenciasHelper.limpiarPreferencias()
+    }
 
     fun obtenerMiUsuario() {
         viewModelScope.launch {
@@ -52,7 +60,21 @@ class UsuarioViewModel @Inject constructor(
         }
     }
 
-    fun actualizarMiPerfil(dtoUsuario: UsuarioDto, imagenUri: Uri?) {
+    fun actualizarMiPerfil(nombre: String, apellido: String, email: String, celular: String, imagenUri: Uri?) {
+        if (celular.length != 9) {
+            viewModelScope.launch { _error.emit("El número de celular debe tener 9 dígitos.") }
+            return
+        }
+        val dto = UsuarioDto().apply {
+            this.nombre = nombre
+            this.apellido = apellido
+            this.email = email
+            this.celular = celular
+        }
+        actualizarMiPerfil(dto, imagenUri)
+    }
+
+    private fun actualizarMiPerfil(dtoUsuario: UsuarioDto, imagenUri: Uri?) {
         viewModelScope.launch {
             if (dtoUsuario.nombre.isNullOrEmpty()) { _error.emit("El campo nombre no puede estar vacío"); return@launch }
             if (dtoUsuario.apellido.isNullOrEmpty()) { _error.emit("El campo apellido no puede estar vacío"); return@launch }

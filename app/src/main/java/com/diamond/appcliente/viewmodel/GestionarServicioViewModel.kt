@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.diamond.barbershop.shared.dto.servicio.ServicioDto
 import com.diamond.barbershop.shared.dto.servicio.ServicioRequest
 import com.diamond.appcliente.repository.ServicioRepository
-import com.diamond.appcliente.ui.state.UiState
+import com.shared.models.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

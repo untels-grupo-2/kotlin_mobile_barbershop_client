@@ -11,17 +11,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.diamond.appcliente.R
-import com.diamond.appcliente.dto.reserva.DtoReserva
 import com.google.android.material.appbar.MaterialToolbar
-import com.diamond.appcliente.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarReservaViewModel
 import com.diamond.appcliente.viewmodel.ListarReservaViewModel
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -91,10 +87,8 @@ class ReservaActivity : AuthActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    listarReservaViewModel.reservas.collect { state ->
-                        if (state is UiState.Success) {
-                            activarBotonReservaRecompensa(state.data.count { it.estRecompensa == 0 } >= 10)
-                        }
+                    listarReservaViewModel.recompensaCount.collect { count ->
+                        activarBotonReservaRecompensa(count >= 10)
                     }
                 }
                 launch {
@@ -141,14 +135,10 @@ class ReservaActivity : AuthActivity() {
     }
 
     private fun enviarReserva(barberoId: Long) {
-        val request = DtoReserva(barberoId, horarioRangoId, textViewFecha.text.toString(), servicio_id, editTextAdicionales.text.toString())
-        Log.d("Reserva", "Datos de la reserva: ${Gson().toJson(request)}")
-        reservaViewModel.enviarReserva(request)
+        reservaViewModel.enviarReserva(barberoId, horarioRangoId, textViewFecha.text.toString(), servicio_id, editTextAdicionales.text.toString())
     }
 
     private fun enviarReservaRecompensa(barberoId: Long) {
-        val request = DtoReserva(barberoId, horarioRangoId, textViewFecha.text.toString(), servicio_id, editTextAdicionales.text.toString())
-        Log.d("Reserva", "Datos de la reserva con recompensa: ${Gson().toJson(request)}")
-        reservaViewModel.crearReservaRecompensa(request)
+        reservaViewModel.crearReservaRecompensa(barberoId, horarioRangoId, textViewFecha.text.toString(), servicio_id, editTextAdicionales.text.toString())
     }
 }
