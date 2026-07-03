@@ -23,6 +23,7 @@ import com.shared.models.ui.state.UiState
 import com.diamond.appcliente.viewmodel.GestionarServicioViewModel
 import com.diamond.appcliente.viewmodel.UsuarioViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -35,6 +36,7 @@ class SeccionServiciosActivity : AuthActivity() {
     private var listaServicios: List<ServicioDto> = emptyList()
     private val viewModel1: GestionarServicioViewModel by viewModels()
     private val usuarioViewModel: UsuarioViewModel by viewModels()
+    private var staleSnackbar: Snackbar? = null
 
     private var nombreCliente: String? = null
     private var apellidoCliente: String? = null
@@ -85,6 +87,7 @@ class SeccionServiciosActivity : AuthActivity() {
                             is UiState.Loading -> progressBarServicios.visibility = View.VISIBLE
                             is UiState.Success -> {
                                 progressBarServicios.visibility = View.GONE
+                                mostrarIndicadorDatos(state.isStale)
                                 if (state.data.isNotEmpty()) {
                                     listaServicios = state.data
                                     adapter = ServicioAdapter(state.data, object : ServicioAdapter.OnServicioClickListener {
@@ -117,6 +120,22 @@ class SeccionServiciosActivity : AuthActivity() {
 
         usuarioViewModel.obtenerMiUsuario()
         viewModel1.cargarServicios()
+    }
+
+    private fun mostrarIndicadorDatos(isStale: Boolean) {
+        if (isStale) {
+            if (staleSnackbar?.isShown != true) {
+                staleSnackbar = Snackbar.make(
+                    findViewById(android.R.id.content),
+                    "Sin conexión – mostrando datos guardados",
+                    Snackbar.LENGTH_INDEFINITE
+                )
+                staleSnackbar?.show()
+            }
+        } else {
+            staleSnackbar?.dismiss()
+            staleSnackbar = null
+        }
     }
 
     private fun filterServiciosByType(tipo: String): List<ServicioDto> =
