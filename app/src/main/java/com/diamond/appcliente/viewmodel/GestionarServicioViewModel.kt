@@ -2,11 +2,13 @@ package com.diamond.appcliente.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.diamond.appcliente.util.CacheAwareData
 import com.diamond.barbershop.shared.dto.servicio.ServicioDto
 import com.diamond.barbershop.shared.dto.servicio.ServicioRequest
 import com.diamond.appcliente.repository.ServicioRepository
 import com.shared.models.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -30,13 +32,25 @@ class GestionarServicioViewModel @Inject constructor(
     private val _crudError = MutableSharedFlow<String>()
     val crudError: SharedFlow<String> = _crudError.asSharedFlow()
 
+    private var loadJob: Job? = null
+
     fun cargarServicios() {
-        viewModelScope.launch {
-            _servicios.value = UiState.Loading
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            if (_servicios.value !is UiState.Success) {
+                _servicios.value = UiState.Loading
+            }
             try {
-                _servicios.value = UiState.Success(servicioRepository.listarServicios())
+                servicioRepository.observarServicios().collect { result ->
+                    _servicios.value = when (result) {
+                        is CacheAwareData.Stale -> UiState.Success(result.data, isStale = true)
+                        is CacheAwareData.Fresh -> UiState.Success(result.data, isStale = false)
+                    }
+                }
             } catch (e: Exception) {
-                _servicios.value = UiState.Error(e.message ?: "Error desconocido")
+                if (_servicios.value !is UiState.Success) {
+                    _servicios.value = UiState.Error(e.message ?: "Error desconocido")
+                }
             }
         }
     }
