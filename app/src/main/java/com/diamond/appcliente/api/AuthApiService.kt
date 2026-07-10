@@ -38,7 +38,7 @@ interface AuthApiService {
     @POST("api/autenticacion/refresh-token")
     fun refresh(@Body refreshRequest: RefreshRequest): Call<LoginResponse>
 
-    @POST("api/autenticacion/reset-password")
+    @POST("api/email/password")
     suspend fun recuperarContraseña(@Body recuperacionRequest: RecuperacionRequest): Response<RecuperacionResponse>
 
     @GET("api/barberos")
